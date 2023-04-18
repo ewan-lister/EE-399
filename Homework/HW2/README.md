@@ -21,7 +21,7 @@ In the following sections, we plot and interpret our results,
 
 ## Theoretical Background
 
-$\begin{equation*}
+\begin{equation*}
 A = U\Sigma V^T =
 \begin{bmatrix}
 u_{11} & u_{12} \\
@@ -35,7 +35,7 @@ u_{21} & u_{22}
 v_{11} & v_{12} \\
 v_{21} & v_{22}
 \end{bmatrix}^T
-\end{equation*}$
+\end{equation*}
 
 Title/author/abstract Title, author/address lines, and short (100 words or less) abstract. 
 Sec. I. Introduction and Overview

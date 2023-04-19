@@ -41,7 +41,7 @@ $$ Av = \lambda v$$
 
 Singular Value Decomposition or SVD is a ubiquitous technique in data analysis that allows dimensional data to be decomposed into so called modes and singular values. Much like eigenvectors, modes provide a better description of what matrix data is actually composed of. SVD consists of decomposing a matrix $A$ in the following fashion:
 
-$$ A = U\SigmaV^{T}$$
+$$ A = U\Sigma V^{T}$$
 
 Where A can be any matrix of size $m \times n$, U is assumed to be unitary, S is a diagonal matrix with positive entries, and V is unitary. Thus 
 
@@ -68,11 +68,11 @@ Sec. III. Algorithm Implementation and Development
 Sec. IV. Computational Results
 Sec. V. Summary and Conclusions
 
-![Fig. 1. Correlation of 100 Images](./figures/correlation_matrix_100.png)
-![Fig. 2. High and Low Correlation Images](./figures/high_low_correlation_faces.png)
-![Fig. 3. Correlation of 10 Images](./figures/correlation_matrix_10.png)
-![Fig. 4. Eigenfaces](./figures/eigenfaces.png)
-![Fig. 5. 1st Eigenvector vs. 1st Mode](./figures/eigen_vs_1st_mode.png)
-![Fig. 6. First 6 Modes](./figures/first_6_modes.png)
+![Fig. 1. Correlation of 100 Images](./Figures/correlation_matrix_100.png)
+![Fig. 2. High and Low Correlation Images](./Figures/high_low_correlation_faces.png)
+![Fig. 3. Correlation of 10 Images](.Ffigures/correlation_matrix_10.png)
+![Fig. 4. Eigenfaces](./Figures/eigenfaces.png)
+![Fig. 5. 1st Eigenvector vs. 1st Mode](./Figures/eigen_vs_1st_mode.png)
+![Fig. 6. First 6 Modes](./Figures/first_6_modes.png)
 
 

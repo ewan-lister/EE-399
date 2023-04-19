@@ -127,6 +127,62 @@ plot images
     plt.tight_layout()
     plt.show()
 
+### (c) Repeat part (a) but now compute the 10 × 10 correlation matrix between images and plot the correlation matrix between them.
+
+    images = [1, 313, 512, 5, 2400, 113, 1024, 87, 314, 2005]
+
+isolate images and calculate correlation matrix, account for 1 based indexing
+
+    image_indices = [1, 313, 512, 5, 2400, 113, 1024, 87, 314, 2005]
+    selected_images = X[:, [i - 1 for i in image_indices]]
+
+    correlation_matrix = np.dot(selected_images.T, selected_images)
+
+plot correlation matrix
+
+    plt.figure(figsize=(8, 8))
+    plt.imshow(correlation_matrix, cmap='viridis')
+    plt.colorbar()
+
+    plt.title('Correlation Matrix of Selected Images')
+    plt.xlabel('Image Index')
+    plt.ylabel('Image Index')
+
+    plt.xticks(np.arange(0, 10), image_indices)
+    plt.yticks(np.arange(0, 10), image_indices)
+
+    plt.show()
+
+
+### (d) Create the matrix $Y = XX^{T}$ and find the first six eigenvectors with the largest magnitude eigenvalue.
+
+create symmetric matrix, similar to correlation matrix of all images, and compute eigenpairs
+    
+    Y = np.dot(X,np.transpose(X))
+
+    eigenvalues, eigenvectors = np.linalg.eigh(Y)
+
+sort eigenvalues and vectors by eigenvalue magnitude, select first 6 eigen vectors in sorted list
+    
+    sorted_indices = np.argsort(eigenvalues)[::-1]
+    sorted_eigenvalues = eigenvalues[sorted_indices]
+    sorted_eigenvectors = eigenvectors[:, sorted_indices]
+
+    first_6_eigenvectors = sorted_eigenvectors[:, :6]
+
+plot and print first 6 eigenvectors
+
+    print(first_6_eigenvectors)
+    fig, axs = plt.subplots(2, 3, figsize=(12, 8))
+    for i in range(6):
+        row = i // 3
+        col = i % 3
+        axs[row, col].imshow(first_6_eigenvectors[:, i].reshape(32, 32), cmap='viridis')
+        axs[row, col].set_title('Eigenvector {}'.format(i+1))
+        axs[row, col].axis('off')
+
+    plt.tight_layout()
+    plt.show()
 
 Title/author/abstract Title, author/address lines, and short (100 words or less) abstract. 
 Sec. I. Introduction and Overview

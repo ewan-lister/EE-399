@@ -43,23 +43,90 @@ Singular Value Decomposition or SVD is a ubiquitous technique in data analysis t
 
 $$ A = U\Sigma V^{T}$$
 
-Where A can be any matrix of size $m \times n$, U is assumed to be unitary, S is a diagonal matrix with positive entries, and V is unitary. Thus 
+Where A can be any matrix of size $m \times n$, U is assumed to be unitary, S is a diagonal matrix with positive entries, and V is unitary. Thus the matrix is represented as a linear combination of basis vectors operating on a unitary matrix V.
 
-\begin{equation*}
-A = U\Sigma V^T =
-\begin{bmatrix}
-u_{11} & u_{12} \\
-u_{21} & u_{22}
-\end{bmatrix}
-\begin{bmatrix}
-\sigma_1 & 0 \\
-0 & \sigma_2
-\end{bmatrix}
-\begin{bmatrix}
-v_{11} & v_{12} \\
-v_{21} & v_{22}
-\end{bmatrix}^T
-\end{equation*} 
+In the following section we will explore the use of these techniques on the `yalefaces.mat` data.
+
+
+## Algorithm Implementation and Development
+
+import statements and loading data
+
+    # import numpy, scipy, and yale faces data
+    import numpy as np
+    from scipy.io import loadmat
+    import matplotlib.pyplot as plt
+    results=loadmat('yalefaces.mat')
+    X=results['X'] 
+
+### (a) Compute a 100 × 100 correlation matrix $C$ where you will compute the dot product (correlation) between the first 100 images in the matrix $X$.
+
+isolate first 100 vectors in matrix and compute dot product
+
+    first_100_images = X[:, :100]
+
+    correlation_matrix = np.dot(first_100_images.T, first_100_images)
+
+plot correlation matrix
+
+    # Plot the correlation matrix
+plt.figure(figsize=(10, 10))
+plt.imshow(correlation_matrix, cmap='viridis')
+plt.colorbar()
+
+    # Set the title and axes labels
+    plt.title('Correlation Matrix of the First 100 Images')
+    plt.xlabel('Image Index')
+    plt.ylabel('Image Index')
+
+    # Adjust the axes range and ticks
+    plt.xlim(-0.5, 99.5)
+    plt.ylim(99.5, -0.5)
+    plt.xticks(np.arange(0, 100, 10))
+    plt.yticks(np.arange(0, 100, 10))
+
+    # Show the plot
+    plt.show()
+
+### (b) From the correlation matrix for part (a), which two images are most highly correlated? Which are most uncorrelated? Plot these faces.
+
+mask matrix data so that identical but low correlation value images are not used
+
+    masked_corr_matrix = np.ma.array(correlation_matrix, mask=np.eye(correlation_matrix.shape[0], dtype=bool))
+
+identify min and max correlation images and extract
+
+    max_corr_indices = np.unravel_index(np.ma.argmax(masked_corr_matrix), masked_corr_matrix.shape)
+    min_corr_indices = np.unravel_index(np.ma.argmin(masked_corr_matrix), masked_corr_matrix.shape)
+
+    highest_corr_images = first_100_images[:, max_corr_indices]
+    lowest_corr_images = first_100_images[:, min_corr_indices]
+
+plot images 
+
+    fig, axs = plt.subplots(2, 2, figsize=(10, 10))
+
+    # Plot the images with highest correlation
+    axs[0, 0].imshow(highest_corr_images[:, 0].reshape(32, 32), cmap='viridis')
+    axs[0, 0].set_title('Image {} (High Correlation)'.format(max_corr_indices[0]))
+    axs[0, 0].axis('off')
+
+    axs[0, 1].imshow(highest_corr_images[:, 1].reshape(32, 32), cmap='viridis')
+    axs[0, 1].set_title('Image {} (High Correlation)'.format(max_corr_indices[1]))
+    axs[0, 1].axis('off')
+
+    # Plot the images with lowest correlation
+    axs[1, 0].imshow(lowest_corr_images[:, 0].reshape(32, 32), cmap='viridis')
+    axs[1, 0].set_title('Image {} (Low Correlation)'.format(min_corr_indices[0]))
+    axs[1, 0].axis('off')
+
+    axs[1, 1].imshow(lowest_corr_images[:, 1].reshape(32, 32), cmap='viridis')
+    axs[1, 1].set_title('Image {} (Low Correlation)'.format(min_corr_indices[1]))
+    axs[1, 1].axis('off')
+
+    plt.tight_layout()
+    plt.show()
+
 
 Title/author/abstract Title, author/address lines, and short (100 words or less) abstract. 
 Sec. I. Introduction and Overview

@@ -252,22 +252,22 @@ plot first 6 modes
 ## Computational Results
 
 ### Problem (a) 100 x 100 correlation matrix
-![Fig. 1. Correlation of 100 Images](./Figures/correlation_matrix_100.png)
+![Fig. 1. Correlation of 100 Images](./Figures/correlation_matrix_100.jpg)
 
 ### Problem (b) Most and least correlated images
-![Fig. 2. High and Low Correlation Images](./Figures/high_low_correlation_faces.png)
+![Fig. 2. High and Low Correlation Images](./Figures/high_low_correlation_faces.jpg)
 
 ### Problem (c) 10 x 10 correlation matrix
-![Fig. 3. Correlation of 10 Images](./Figures/correlation_matrix_10.png)
+![Fig. 3. Correlation of 10 Images](./Figures/correlation_matrix_10.jpg)
 
 ### Problem (d) First 6 eigenvectors of matrix $Y$
-![Fig. 4. Eigenfaces](./Figures/eigenfaces.png)
+![Fig. 4. Eigenfaces](./Figures/eigenfaces.jpg)
 
 ### (f) Principal eigenvector and first mode comparison
-![Fig. 5. 1st Eigenvector vs. 1st Mode](./Figures/eigen_vs_1st_mode.png)
+![Fig. 5. 1st Eigenvector vs. 1st Mode](./Figures/eigen_vs_1st_mode.jpg)
 
 ### (g) First 6 modes and respective percentage of variance captured
-![Fig. 6. First 6 Modes](./Figures/first_6_modes.png)
+![Fig. 6. First 6 Modes](./Figures/first_6_modes.jpg)
 
 
 
@@ -278,12 +278,5 @@ Sec. III. Algorithm Implementation and Development
 Sec. IV. Computational Results
 
 ## V. Summary and Conclusions
-
-![Fig. 1. Correlation of 100 Images](./Figures/correlation_matrix_100.png)
-![Fig. 2. High and Low Correlation Images](./Figures/high_low_correlation_faces.png)
-![Fig. 3. Correlation of 10 Images](./Figures/correlation_matrix_10.png)
-![Fig. 4. Eigenfaces](./Figures/eigenfaces.png)
-![Fig. 5. 1st Eigenvector vs. 1st Mode](./Figures/eigen_vs_1st_mode.png)
-![Fig. 6. First 6 Modes](./Figures/first_6_modes.png)
 
 

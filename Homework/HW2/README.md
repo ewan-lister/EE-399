@@ -184,16 +184,104 @@ plot and print first 6 eigenvectors
     plt.tight_layout()
     plt.show()
 
+### (e) SVD the matrix X and find the first six principal component directions.
+
+perform SVD using numpy function, and take first 6 principle component directions, print component directions
+
+    U, S, Vt = np.linalg.svd(X, full_matrices=False)
+
+    first_6_principal_components = Vt[:6, :]
+
+    print(first_6_principal_components)
+
+### (f) Compare the first eigenvector $v_{1}$ from (d) with the first SVD mode $u_{1}$ from (e) and compute the norm of difference of their absolute values.
+
+compute absolute values and take norm difference
+
+    abs_first_eigenvector = np.abs(sorted_eigenvectors[:, 0])
+    abs_first_svd_mode = np.abs(U[:, 0])
+
+    # Compute the norm difference of the absolute values
+    norm_difference = np.linalg.norm(abs_first_eigenvector - abs_first_svd_mode)
+
+plot and print
+    print("Norm difference of the absolute values:", norm_difference)
+
+    fig, axs = plt.subplots(1, 2, figsize=(12, 6))
+
+    # Plot the first eigenvector
+    axs[0].imshow(sorted_eigenvectors[:, 0].reshape(32, 32), cmap='viridis')
+    axs[0].set_title('First Eigenvector')
+    axs[0].axis('off')
+
+    # Plot the first SVD mode from the U matrix
+    axs[1].imshow(U[:, 0].reshape(32, 32), cmap='viridis')
+    axs[1].set_title('First SVD Mode (U matrix)')
+    axs[1].axis('off')
+
+    plt.tight_layout()
+    plt.show()
+
+### (g) Compute the percentage of variance captured by each of the first 6 SVD modes. Plot the first 6 SVD modes.
+
+compute total variance captured by all modes and divide individual variances captured by total variance
+    
+    total_variance_captured = np.sum(S ** 2)
+
+    variance_captured = (S ** 2) / total_variance_captured
+
+convert to percentage and print
+
+    percentage_variance_captured = variance_captured * 100
+
+    for i in range(6):
+        print("Percentage of the variance captured by Mode {}: {:.2f}%".format(i+1, percentage_variance_captured[i]))
+
+plot first 6 modes
+
+    for i in range(6):
+        row = i // 3
+        col = i % 3
+        axs[row, col].imshow(U[:, i].reshape(32, 32), cmap='viridis')
+        axs[row, col].set_title('Mode {}: {:.2f}%'.format(i+1, percentage_variance_captured[i]))
+        axs[row, col].axis('off')
+
+    plt.tight_layout()
+    plt.show()
+
+## Computational Results
+
+### Problem (a) 100 x 100 correlation matrix
+![Fig. 1. Correlation of 100 Images](./Figures/correlation_matrix_100.png)
+
+### Problem (b) Most and least correlated images
+![Fig. 2. High and Low Correlation Images](./Figures/high_low_correlation_faces.png)
+
+### Problem (c) 10 x 10 correlation matrix
+![Fig. 3. Correlation of 10 Images](./Figures/correlation_matrix_10.png)
+
+### Problem (d) First 6 eigenvectors of matrix $Y$
+![Fig. 4. Eigenfaces](./Figures/eigenfaces.png)
+
+### (f) Principal eigenvector and first mode comparison
+![Fig. 5. 1st Eigenvector vs. 1st Mode](./Figures/eigen_vs_1st_mode.png)
+
+### (g) First 6 modes and respective percentage of variance captured
+![Fig. 6. First 6 Modes](./Figures/first_6_modes.png)
+
+
+
 Title/author/abstract Title, author/address lines, and short (100 words or less) abstract. 
 Sec. I. Introduction and Overview
 Sec. II. Theoretical Background
 Sec. III. Algorithm Implementation and Development 
 Sec. IV. Computational Results
-Sec. V. Summary and Conclusions
+
+## V. Summary and Conclusions
 
 ![Fig. 1. Correlation of 100 Images](./Figures/correlation_matrix_100.png)
 ![Fig. 2. High and Low Correlation Images](./Figures/high_low_correlation_faces.png)
-![Fig. 3. Correlation of 10 Images](.Ffigures/correlation_matrix_10.png)
+![Fig. 3. Correlation of 10 Images](./Figures/correlation_matrix_10.png)
 ![Fig. 4. Eigenfaces](./Figures/eigenfaces.png)
 ![Fig. 5. 1st Eigenvector vs. 1st Mode](./Figures/eigen_vs_1st_mode.png)
 ![Fig. 6. First 6 Modes](./Figures/first_6_modes.png)

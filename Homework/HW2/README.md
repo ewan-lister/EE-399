@@ -252,7 +252,7 @@ plot first 6 modes
 ## Computational Results
 
 ### Problem (a) 100 x 100 correlation matrix
-![Fig. 1. Correlation of 100 Images](./Figures/correlation_matrix_100.jpg)
+![Fig. 1. Correlation of 100 Images](./Figures/correlation_matrix_100.png)
 
 ### Problem (b) Most and least correlated images
 ![Fig. 2. High and Low Correlation Images](./Figures/high_low_correlation_faces.jpg)

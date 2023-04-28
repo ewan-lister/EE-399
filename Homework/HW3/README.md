@@ -340,8 +340,8 @@ identify worst and best digits to separate and training and test data from dicti
 
     worst_digs = (7, 9)
     best_digs = (6, 7)
-    worst_set = data_dict(worst_digs)
-    best_set = data_dict(best_digs)
+    worst_set = data_dict[worst_digs]
+    best_set = data_dict[best_digs]
 
 fit LDA classifier
 
@@ -368,22 +368,32 @@ fit DTC classifier
 
 ![Fig. 2. First 12 Modes of U](./Figures/first_12_modes.png)
 
+Because the U modes of the MNIST matrix for a basis for the space in which all of the images exist, we can actually begin to construct legible images by simply taking linear combinations of the U modes. After all, an MNIST image is really just a 784 dimension vector. The first mode of U already accounts for about 44% of the variance between vectors, so by adding the first mode to the second mode, we get something that quite closely resembles a well known digit:
+
 ![Fig. 3. First and Second Mode Added](./Figures/lin_combination_1_2.png)
+
+
 
 ### 3. What is the interpretation of the U, Σ, and V matrices?
 
 The U, $\Sigma$ and V matrices represent the transformation that the facial images data causes to a vector. 
 
-
 Let's refer to the facial images data as matrix A. The columns of U form an orthonormal basis for the vector space of A, and capture the directions of maximum variance in the row space of A. In other words, the first column of U is the vector which when reshaped to image size represents the most significant vector in the basis of A, which you would need to reconstruct the majority of images which are columns in A.
 
 The singular values of the diagonal of $\Sigma$ represent the amount of variance captured by each respective vector in U. Consider that taking the dot product of $u_1$ with every column vector in A, and taking the sum of these dot products would be a related value, and $u_2$ would have a smaller value. In fact, in this specific decomposition, the first U mode $u_1$ captures 43.5% of the variance, while all others only capture below 5 percent. This makes sense, given that the data set contains images of integers that are only slightly rotated from vertical, and are typically centered. The rest of the image is white space, and you need only one mode to get almost halfway towards plotting a number.
+
+As for V, V is simply the basis for the row space of A, where each column of V is a vector, and each vector is ranked according to how much variance it's direction captures. SVD forms of A would contain $V^T$, so instead the rows of V are a basis for the row space of A.
 
 
 ### 4. Projection of images onto three modes
 
 ![Fig. 4. Projection of data onto first 3 principal modes](./Figures/proj_3_modes_all.png)
 
+When we project onto modes 2, 3, and 5, we are essentially taking the dot product of one column in A with some label against mode 2, then mode 3, then mode 5. The results of these dot products form a 3d coordinate, we then plot this coordinate and label it according to the digit that described the image. Carry this out for all images in the data, and soon you have a graphical understanding of how all of the points relate to the modes.
+
+In the plot much of the data 
+
+![Fig. 5. Gif of Projection of data onto first 3 principal modes](./Figures/proj_3_modes_all.gif)
 ### **Building and Comparing Classifiers**
 
 ### Results of LDA Classifier on two arbitrary digits

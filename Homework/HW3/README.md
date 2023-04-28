@@ -20,7 +20,7 @@ Finally, we provide a summary and conclusions, discussing the key findings of ou
 
 In this section we will present mathematical theory covering the topics of correlation, eigenpairs, and singular value decomposition. Knowing the basic principles of these techniques will help us to investigate the facial image data.
 
-## Support Vector Machines (SVM)
+# Support Vector Machines (SVM)
 
 Support Vector Machines (SVM) are a popular class of binary classifiers used in machine learning. The goal of SVM is to find a hyperplane that maximally separates two classes of data points. This hyperplane is chosen to maximize the margin between the two classes of points.
 
@@ -32,94 +32,29 @@ subject to the constraints:
 
 $$y_i(w^Tx_i+b) \\geq 1 - \\xi_i$$
 
-$\\xi_i \\geq 0$
+$$\\xi_i \\geq 0$$
 
 
 where $w$ is the weight vector, $b$ is the bias term, $\xi_i$ is the slack variable, and $C$ is a hyperparameter that controls the trade-off between maximizing the margin and minimizing the classification error. The first constraint ensures that each data point is on the correct side of the hyperplane, while the second constraint ensures that the margin is not too wide.
 
-## Linear Discriminant Analysis (LDA)
+# Linear Discriminant Analysis (LDA)
 Linear Discriminant Analysis (LDA) is a popular method for dimensionality reduction and classification. The goal of LDA is to find a linear transformation of the data that maximizes the separation between two classes.
 
 The LDA optimization problem can be written as follows:
 
-max
-⁡
-�
-�
-�
-�
-�
-�
-�
-�
-�
-�
-�
-max 
-w
-​
-  
-w 
-T
- S 
-w
-​
- w
-w 
-T
- S 
-b
-​
- w
-​
- 
+$$max_{w} \\frac{w^TS_bw}{w^TS_ww}$$
 
 where $S_b$ is the between-class scatter matrix and $S_w$ is the within-class scatter matrix. The between-class scatter matrix measures the distance between the class means, while the within-class scatter matrix measures the variability within each class.
 
 The optimal weight vector $w$ is then used to project the data onto a lower-dimensional subspace, which can be used for classification.
 
-Decision Trees
+# Decision Trees
+
 Decision trees are a popular class of classifiers that use a tree structure to recursively partition the feature space. The goal of a decision tree is to find the optimal set of binary splits that minimize the classification error.
 
 The decision tree optimization problem can be written as follows:
 
-min
-⁡
-Θ
-∑
-�
-=
-1
-�
-�
-(
-�
-�
-≠
-�
-(
-�
-�
-;
-Θ
-)
-)
-min 
-Θ
-​
- ∑ 
-i=1
-n
-​
- I(y 
-i
-​
- 
-
-=f(x 
-i
-​
- ;Θ))
+$$min_{\\Theta} \\sum_{i=1}^{n} I(y_i \\neq f(x_i; \\Theta))$$
 
 where $\Theta$ is the set of binary splits, $f(x_i; \Theta)$ is the decision tree classifier, and $I(y_i \neq f(x_i; \Theta))$ is the classification error. The optimal set of binary splits can be found using various algorithms, such as greedy search or dynamic programming.
 
@@ -128,206 +63,115 @@ Overall, SVM, LDA, and decision trees are all popular and effective methods for 
 
 ## Algorithm Implementation and Development
 
-import statements and loading data
+import libraries and load mnist data
 
-    # import numpy, scipy, and yale faces data
     import numpy as np
-    from scipy.io import loadmat
+    from sklearn.datasets import fetch_openml
+    from sklearn.decomposition import PCA
     import matplotlib.pyplot as plt
-    results=loadmat('yalefaces.mat')
-    X=results['X'] 
+    from sklearn.tree import DecisionTreeClassifier
+    from sklearn.svm import SVC
+    from sklearn.model_selection import train_test_split
+    from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+    from sklearn.metrics import accuracy_score
 
-### (a) Compute a 100 × 100 correlation matrix $C$ where you will compute the dot product (correlation) between the first 100 images in the matrix $X$.
+    # fetch MNIST dataset
+    mnist = fetch_openml('mnist_784', version=1)
 
-isolate first 100 vectors in matrix and compute dot product
+    # Convert the data and labels into numpy arrays
+    data = np.array(mnist['data'])
+    labels = np.array(mnist['target'])
 
-    first_100_images = X[:, :100]
+    # take transpose of data to convert to short-wide matrix
+    data = data.T
 
-    correlation_matrix = np.dot(first_100_images.T, first_100_images)
+### 1. Do an SVD analysis of the digit images. You will need to reshape each image into a column vector and each column of your data matrix is a different image.
 
-plot correlation matrix
+call numpy linear algebra SVD method, execute
 
-    # Plot the correlation matrix
-plt.figure(figsize=(10, 10))
-plt.imshow(correlation_matrix, cmap='viridis')
-plt.colorbar()
+    U, S, Vt = np.linalg.svd(data, full_matrices=False)
+
+### 2. What does the singular value spectrum look like and how many modes are necessary for good image reconstruction? (i.e. what is the rank rof the digit space?)
+
+plot and print first 50 SV
+
+    # initialize white facecolor for plots
+    w = 'white'
+
+    # print first 50 singular values
+    print(S[0:50])
+
+    # Plot singular values
+    plt.figure(figsize=(8, 8))
+    plt.stem(np.arange(0, 50), S[0:50])
 
     # Set the title and axes labels
-    plt.title('Correlation Matrix of the First 100 Images')
-    plt.xlabel('Image Index')
-    plt.ylabel('Image Index')
-
-    # Adjust the axes range and ticks
-    plt.xlim(-0.5, 99.5)
-    plt.ylim(99.5, -0.5)
-    plt.xticks(np.arange(0, 100, 10))
-    plt.yticks(np.arange(0, 100, 10))
+    plt.title('Singular Values of SVD on MNIST')
+    plt.xlabel('Column Number')
+    plt.ylabel('Singular Value')
 
     # Show the plot
+    plt.savefig('./Figures/first_50_singular_values.png', facecolor=w)
     plt.show()
 
-### (b) From the correlation matrix for part (a), which two images are most highly correlated? Which are most uncorrelated? Plot these faces.
+compute total variance captured by all modes
 
-mask matrix data so that identical but low correlation value images are not used
-
-    masked_corr_matrix = np.ma.array(correlation_matrix, mask=np.eye(correlation_matrix.shape[0], dtype=bool))
-
-identify min and max correlation images and extract
-
-    max_corr_indices = np.unravel_index(np.ma.argmax(masked_corr_matrix), masked_corr_matrix.shape)
-    min_corr_indices = np.unravel_index(np.ma.argmin(masked_corr_matrix), masked_corr_matrix.shape)
-
-    highest_corr_images = first_100_images[:, max_corr_indices]
-    lowest_corr_images = first_100_images[:, min_corr_indices]
-
-plot images 
-
-    fig, axs = plt.subplots(2, 2, figsize=(10, 10))
-
-    # Plot the images with highest correlation
-    axs[0, 0].imshow(highest_corr_images[:, 0].reshape(32, 32), cmap='viridis')
-    axs[0, 0].set_title('Image {} (High Correlation)'.format(max_corr_indices[0]))
-    axs[0, 0].axis('off')
-
-    axs[0, 1].imshow(highest_corr_images[:, 1].reshape(32, 32), cmap='viridis')
-    axs[0, 1].set_title('Image {} (High Correlation)'.format(max_corr_indices[1]))
-    axs[0, 1].axis('off')
-
-    # Plot the images with lowest correlation
-    axs[1, 0].imshow(lowest_corr_images[:, 0].reshape(32, 32), cmap='viridis')
-    axs[1, 0].set_title('Image {} (Low Correlation)'.format(min_corr_indices[0]))
-    axs[1, 0].axis('off')
-
-    axs[1, 1].imshow(lowest_corr_images[:, 1].reshape(32, 32), cmap='viridis')
-    axs[1, 1].set_title('Image {} (Low Correlation)'.format(min_corr_indices[1]))
-    axs[1, 1].axis('off')
-
-    plt.tight_layout()
-    plt.show()
-
-### (c) Repeat part (a) but now compute the 10 × 10 correlation matrix between images and plot the correlation matrix between them.
-
-    images = [1, 313, 512, 5, 2400, 113, 1024, 87, 314, 2005]
-
-isolate images and calculate correlation matrix, account for 1 based indexing
-
-    image_indices = [1, 313, 512, 5, 2400, 113, 1024, 87, 314, 2005]
-    selected_images = X[:, [i - 1 for i in image_indices]]
-
-    correlation_matrix = np.dot(selected_images.T, selected_images)
-
-plot correlation matrix
-
-    plt.figure(figsize=(8, 8))
-    plt.imshow(correlation_matrix, cmap='viridis')
-    plt.colorbar()
-
-    plt.title('Correlation Matrix of Selected Images')
-    plt.xlabel('Image Index')
-    plt.ylabel('Image Index')
-
-    plt.xticks(np.arange(0, 10), image_indices)
-    plt.yticks(np.arange(0, 10), image_indices)
-
-    plt.show()
-
-
-### (d) Create the matrix $Y = XX^{T}$ and find the first six eigenvectors with the largest magnitude eigenvalue.
-
-create symmetric matrix, similar to correlation matrix of all images, and compute eigenpairs
-    
-    Y = np.dot(X,np.transpose(X))
-
-    eigenvalues, eigenvectors = np.linalg.eigh(Y)
-
-sort eigenvalues and vectors by eigenvalue magnitude, select first 6 eigen vectors in sorted list
-    
-    sorted_indices = np.argsort(eigenvalues)[::-1]
-    sorted_eigenvalues = eigenvalues[sorted_indices]
-    sorted_eigenvectors = eigenvectors[:, sorted_indices]
-
-    first_6_eigenvectors = sorted_eigenvectors[:, :6]
-
-plot and print first 6 eigenvectors
-
-    print(first_6_eigenvectors)
-    fig, axs = plt.subplots(2, 3, figsize=(12, 8))
-    for i in range(6):
-        row = i // 3
-        col = i % 3
-        axs[row, col].imshow(first_6_eigenvectors[:, i].reshape(32, 32), cmap='viridis')
-        axs[row, col].set_title('Eigenvector {}'.format(i+1))
-        axs[row, col].axis('off')
-
-    plt.tight_layout()
-    plt.show()
-
-### (e) SVD the matrix X and find the first six principal component directions.
-
-perform SVD using numpy function, and take first 6 principle component directions, print component directions
-
-    U, S, Vt = np.linalg.svd(X, full_matrices=False)
-
-    first_6_principal_components = Vt[:6, :]
-
-    print(first_6_principal_components)
-
-### (f) Compare the first eigenvector $v_{1}$ from (d) with the first SVD mode $u_{1}$ from (e) and compute the norm of difference of their absolute values.
-
-compute absolute values and take norm difference
-
-    abs_first_eigenvector = np.abs(sorted_eigenvectors[:, 0])
-    abs_first_svd_mode = np.abs(U[:, 0])
-
-    # Compute the norm difference of the absolute values
-    norm_difference = np.linalg.norm(abs_first_eigenvector - abs_first_svd_mode)
-
-plot and print
-    print("Norm difference of the absolute values:", norm_difference)
-
-    fig, axs = plt.subplots(1, 2, figsize=(12, 6))
-
-    # Plot the first eigenvector
-    axs[0].imshow(sorted_eigenvectors[:, 0].reshape(32, 32), cmap='viridis')
-    axs[0].set_title('First Eigenvector')
-    axs[0].axis('off')
-
-    # Plot the first SVD mode from the U matrix
-    axs[1].imshow(U[:, 0].reshape(32, 32), cmap='viridis')
-    axs[1].set_title('First SVD Mode (U matrix)')
-    axs[1].axis('off')
-
-    plt.tight_layout()
-    plt.show()
-
-### (g) Compute the percentage of variance captured by each of the first 6 SVD modes. Plot the first 6 SVD modes.
-
-compute total variance captured by all modes and divide individual variances captured by total variance
-    
+    # Compute the total variance captured by all modes
     total_variance_captured = np.sum(S ** 2)
 
+    # Compute the variance captured by each mode
     variance_captured = (S ** 2) / total_variance_captured
 
-convert to percentage and print
-
+    # Convert the variance captured to percentage
     percentage_variance_captured = variance_captured * 100
 
+Plot first 12 modes
+
+    # Print the percentage of the variance captured by each mode
     for i in range(6):
         print("Percentage of the variance captured by Mode {}: {:.2f}%".format(i+1, percentage_variance_captured[i]))
 
-plot first 6 modes
+    # Plot the first six modes as images
+    fig, axs = plt.subplots(4, 3, figsize=(12, 8))
 
-    for i in range(6):
+    for i in range(12):
         row = i // 3
         col = i % 3
-        axs[row, col].imshow(U[:, i].reshape(32, 32), cmap='viridis')
+        axs[row, col].imshow(U[:, i].reshape(28, 28), cmap='viridis')
         axs[row, col].set_title('Mode {}: {:.2f}%'.format(i+1, percentage_variance_captured[i]))
         axs[row, col].axis('off')
 
     plt.tight_layout()
+    plt.savefig('./Figures/first_6_modes.jpg', facecolor=w)
     plt.show()
 
-## Computational Results
+
+
+
+### 3. What is the interpretation of the U, Σ, and V matrices?
+
+The U, $\Sigma$ and V matrices represent the transformation that the facial images data causes to a vector. 
+
+
+Let's refer to the facial images data as matrix A. The columns of U form an orthonormal basis for the vector space of A, and capture the directions of maximum variance in the row space of A. In other words, the first column of U is the vector which when reshaped to image size represents the most significant vector in the basis of A, which you would need to reconstruct the majority of images which are columns in A.
+
+The singular values of the diagonal of $\Sigma$ represent the amount of variance captured by each respective vector in U. Consider that taking the dot product of $u_1$ with every column vector in A, and taking the sum of these dot products would be a related value, and $u_2$ would have a smaller value. In fact, in this specific decomposition, the first U mode $u_1$ captures 43.5% of the variance, while all others only capture below 5 percent. This makes sense, given that the data set contains images of integers that are only slightly rotated from vertical, and are typically centered. The rest of the image is white space, and you need only one mode to get almost halfway towards plotting a number.
+
+### 4. On a 3D plot, project onto three selected V-modes (columns) colored by their digit label. For example, columns 2,3, and 5.
+
+### 5. Pick two digits. See if you can build a linear classifier (LDA) that can reasonable identify/classify them.
+
+### 6. Pick three digits. Try to build a linear classifier to identify these three now.
+
+### 7. Which two digits in the data set appear to be the most difficult to separate? Quantify the accuracy of the separation with LDA on the test data.
+
+### 8. Which two digits in the data set are most easy to separate? Quantify the accuracy of the separation with LDA on the test data.
+
+### 9. SVM (support vector machines) and decision tree classifiers were the state-of-the-art until about 2014. How well do these separate between all ten digits? (see code below to get started).
+
+### 10. Compare the performance between LDA, SVM and decision trees on the hardest and easiest pair of digits to separate (from above).
+
+## Computational Results and Interpretation
 
 ### Problem (a) 100 x 100 correlation matrix
 ![Fig. 1. Correlation of 100 Images](./Figures/correlation_matrix_100.png)

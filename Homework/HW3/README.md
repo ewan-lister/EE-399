@@ -225,7 +225,7 @@ classify test data, calculate accuracy, and print
     acc = accuracy_score(y_test, y_pred)
     print(f"Accuracy for digits {(1, 2)}: {acc:.2f}")
 
-### 7. Which two digits in the data set appear to be the most difficult to separate? Quantify the accuracy of the separation with LDA on the test data.
+### 7. Which two digits in the data set appear to be the most difficult to separate? Quantify the accuracy of the separation with LDA on the test data. 8. Which two digits in the data set are most easy to separate? Quantify the accuracy of the separation with LDA on the test data.
 
 define function which fits a classifier to training and test data for two given digits, and prints the accuracy
 
@@ -274,7 +274,7 @@ initialize accuracy matrix
     acc_for_pairs = np.zeros((10, 10))
 
 loop through digit pairs, acces training and test data, and
-call `fit_and_err` function
+call `fit_and_err` function, which prints accuracy
 
     for pair in digit_pairs:
         train_set = data_dict[pair]
@@ -282,13 +282,82 @@ call `fit_and_err` function
         acc_for_pairs[pair[0]][pair[1]] = accuracy
         acc_for_pairs[pair[1]][pair[0]] = accuracy
 
+format matrix for colormap display, set diagonal to some intermediate value between outliers
 
+    acc_for_pairs1 = (acc_for_pairs * 100) - 90
+    np.fill_diagonal(acc_for_pairs1, 8)
 
-### 8. Which two digits in the data set are most easy to separate? Quantify the accuracy of the separation with LDA on the test data.
+plot accuracy matrix
+
+    plt.figure(figsize=(8, 8))
+    plt.imshow(acc_for_pairs1, cmap='viridis')
+    plt.colorbar()
+
+    plt.title('Accuracy Separating pairs of digits with LDA (+ 90%)')
+    plt.xlabel('Digit')
+    plt.ylabel('Digit')
+
+    plt.xticks(np.arange(0, 10))
+    plt.yticks(np.arange(0, 10))
+
+    plt.savefig('./Figures/acc_lda_mat.png', facecolor=w)
+    plt.show()
+
+identify and print arguments for minimum and maximum accuracy values 
+
+    min_idx = np.argmin(acc_for_pairs1)
+    max_idx = np.argmax(acc_for_pairs1)
+    print(min_idx, max_idx)
+
 
 ### 9. SVM (support vector machines) and decision tree classifiers were the state-of-the-art until about 2014. How well do these separate between all ten digits? (see code below to get started).
 
+separate training and test data for all 10 digits
+
+    X_train, X_test, y_train, y_test = train_test_split(mnist.data, mnist.target, test_size=0.2)
+
+initialize SVM classifier and apply to data
+
+    clf = SVC()
+    clf.fit(X_train, y_train)
+
+attempt to classify test data, calculate accuracy, and print
+
+    y_pred = clf.predict(X_test)
+    accuracy = accuracy_score(y_test, y_pred)
+    print(f"Accuracy: {accuracy}")
+
+
 ### 10. Compare the performance between LDA, SVM and decision trees on the hardest and easiest pair of digits to separate (from above).
+
+reinitialize classifiers
+
+    dtc = DecisionTreeClassifier()
+    clf = SVC()
+    lda = LinearDiscriminantAnalysis()
+
+identify worst and best digits to separate and training and test data from dictionary
+
+    worst_digs = (7, 9)
+    best_digs = (6, 7)
+    worst_set = data_dict(worst_digs)
+    best_set = data_dict(best_digs)
+
+fit LDA classifier
+
+    lda_worst = fit_and_err(lda, worst_set, worst_digs)
+    lda_best = fit_and_err(lda, best_set, best_digs)
+
+fit SVM classifier
+
+    svm_worst = fit_and_err(clf, worst_set, worst_digs)
+    svm_best = fit_and_err(clf, best_set, best_digs)
+
+fit DTC classifier
+
+    dtc_worst = fit_and_err(dtc, worst_set, worst_digs)
+    dtc_best = fit_and_err(dtc, best_set, best_digs)
+
 
 ## Computational Results and Interpretation
 

@@ -20,7 +20,7 @@ Finally, we provide a summary and conclusions, discussing the key findings of ou
 
 In this section we will present mathematical theory covering the topics of correlation, eigenpairs, and singular value decomposition. Knowing the basic principles of these techniques will help us to investigate the facial image data.
 
-# Support Vector Machines (SVM)
+### Support Vector Machines (SVM)
 
 Support Vector Machines (SVM) are a popular class of binary classifiers used in machine learning. The goal of SVM is to find a hyperplane that maximally separates two classes of data points. This hyperplane is chosen to maximize the margin between the two classes of points.
 
@@ -37,7 +37,7 @@ $$\\xi_i \\geq 0$$
 
 where $w$ is the weight vector, $b$ is the bias term, $\xi_i$ is the slack variable, and $C$ is a hyperparameter that controls the trade-off between maximizing the margin and minimizing the classification error. The first constraint ensures that each data point is on the correct side of the hyperplane, while the second constraint ensures that the margin is not too wide.
 
-# Linear Discriminant Analysis (LDA)
+### Linear Discriminant Analysis (LDA)
 Linear Discriminant Analysis (LDA) is a popular method for dimensionality reduction and classification. The goal of LDA is to find a linear transformation of the data that maximizes the separation between two classes.
 
 The LDA optimization problem can be written as follows:
@@ -48,7 +48,7 @@ where $S_b$ is the between-class scatter matrix and $S_w$ is the within-class sc
 
 The optimal weight vector $w$ is then used to project the data onto a lower-dimensional subspace, which can be used for classification.
 
-# Decision Trees
+### Decision Trees
 
 Decision trees are a popular class of classifiers that use a tree structure to recursively partition the feature space. The goal of a decision tree is to find the optimal set of binary splits that minimize the classification error.
 
@@ -146,7 +146,125 @@ Plot first 12 modes
     plt.show()
 
 
+### 4. On a 3D plot, project onto three selected V-modes (columns) colored by their digit label. For example, columns 2,3, and 5.
 
+isolate modes 2, 3, and 5 of $V$, project MNIST onto modes
+
+    modes = [1, 2, 4]
+    V = Vt.T
+    V_modes = V[modes, :]
+    proj_data = np.dot(mnist.data, V_modes.T)
+
+plot graph
+
+    fig = plt.figure(figsize=(10, 8))
+    ax = fig.add_subplot(111, projection='3d')
+    targets = np.unique(mnist.target.astype(np.int))
+    colors = plt.cm.jet(np.linspace(0, 1, len(targets)))
+    for target, color in zip(targets, colors):
+        idx = np.where(mnist.target.astype(np.int) == target)
+        ax.scatter(proj_data[idx, 0], proj_data[idx, 1], proj_data[idx, 2], c=color, label=target)
+    ax.set_xlabel('Mode ' + str(modes[0]))
+    ax.set_ylabel('Mode ' + str(modes[1]))
+    ax.set_zlabel('Mode ' + str(modes[2]))
+    ax.legend()
+    plt.title('MNIST Projected onto Principal Modes')
+    plt.savefig('./Figures/proj_3_modes_all.png', facecolor=w)
+    plt.show()
+
+
+### 5. Pick two digits. See if you can build a linear classifier (LDA) that can reasonable identify/classify them.
+
+extract data and labels
+
+    X = np.array(mnist['data'])
+    X = X.T
+    y = np.array(mnist['target'])
+
+pick two digits (1 and 2)
+
+    dig1 = '1'
+    dig2 = '2'
+
+create masks on dataset which select only data with specified digits, define a dictionary for digit pairs
+
+    mask1 = y == dig1
+    mask2 = y == dig2
+    data_dict = {}
+
+concatenate data and labels
+
+    X_1 = X[:, mask1]
+    X_2 = X[:, mask2]
+    y_1 = np.zeros(len(X_1[0]))
+    y_2 = np.ones(len(X_2[0]))
+
+    X_dig = np.concatenate((X_1, X_2), axis=1)
+    X_dig = X_dig.T
+    y_dig = np.concatenate((y_1, y_2))
+
+separate training and test data, organize
+
+    X_train, X_test, y_train, y_test = train_test_split(X_dig, y_dig, test_size=0.3, random_state=42)
+    data_dict[('1','2')] = (X_train, y_train, X_test, y_test)
+
+    one_two = ('1', '2')
+    X_train = data_dict[one_two][0]
+    y_train = data_dict[one_two][1]
+    X_test = data_dict[one_two][2]
+    y_test = data_dict[one_two][3]
+
+initialise linear discriminant analysis type classifier, train
+
+    lda = LinearDiscriminantAnalysis()
+    lda.fit(X_train, y_train)
+
+classify test data, calculate accuracy, and print
+
+    y_pred = lda.predict(X_test)
+    acc = accuracy_score(y_test, y_pred)
+    print(f"Accuracy for digits {(1, 2)}: {acc:.2f}")
+
+### 7. Which two digits in the data set appear to be the most difficult to separate? Quantify the accuracy of the separation with LDA on the test data.
+
+define function which fits a classifier to training and test data for two given digits, and prints the accuracy
+
+    def fit_and_err(lda, train_set, pair):
+        X_train = train_set[0]
+        y_train = train_set[1]
+        X_test = train_set[2]
+        y_test = train_set[3]   
+        # Train a linear classifier
+        lda.fit(X_train, y_train)
+        # Evaluate the performance on the test set
+        y_pred = lda.predict(X_test)
+        acc = accuracy_score(y_test, y_pred)
+        print(f"Accuracy for digits {pair}: {acc:.5f}")
+        return acc
+
+ititialize all possible pairs of unique digits (10 choose 2)
+
+    digit_pairs = [(i, j) for i in range(10) for j in range(i + 1, 10)]
+
+loop over pairs of digits, generate mask, apply mask to data,
+concatenate 
+
+### 8. Which two digits in the data set are most easy to separate? Quantify the accuracy of the separation with LDA on the test data.
+
+### 9. SVM (support vector machines) and decision tree classifiers were the state-of-the-art until about 2014. How well do these separate between all ten digits? (see code below to get started).
+
+### 10. Compare the performance between LDA, SVM and decision trees on the hardest and easiest pair of digits to separate (from above).
+
+## Computational Results and Interpretation
+
+### **Analysis**
+
+### 2. Singular Value Spectrum and Modes
+![Fig. 1. First 50 Singular Values](./Figures/first_50_singular_values.png)
+
+![Fig. 2. First 12 Modes of U](./Figures/first_12_modes.png)
+
+![Fig. 3. First and Second Mode Added](./Figures/lin_combination_1_2.png)
 
 ### 3. What is the interpretation of the U, Σ, and V matrices?
 
@@ -157,27 +275,19 @@ Let's refer to the facial images data as matrix A. The columns of U form an orth
 
 The singular values of the diagonal of $\Sigma$ represent the amount of variance captured by each respective vector in U. Consider that taking the dot product of $u_1$ with every column vector in A, and taking the sum of these dot products would be a related value, and $u_2$ would have a smaller value. In fact, in this specific decomposition, the first U mode $u_1$ captures 43.5% of the variance, while all others only capture below 5 percent. This makes sense, given that the data set contains images of integers that are only slightly rotated from vertical, and are typically centered. The rest of the image is white space, and you need only one mode to get almost halfway towards plotting a number.
 
-### 4. On a 3D plot, project onto three selected V-modes (columns) colored by their digit label. For example, columns 2,3, and 5.
 
-### 5. Pick two digits. See if you can build a linear classifier (LDA) that can reasonable identify/classify them.
+### 4. Projection of images onto three modes
 
-### 6. Pick three digits. Try to build a linear classifier to identify these three now.
+![Fig. 4. Projection of data onto first 3 principal modes](./Figures/proj_3_modes_all.png)
 
-### 7. Which two digits in the data set appear to be the most difficult to separate? Quantify the accuracy of the separation with LDA on the test data.
+### **Building and Comparing Classifiers**
 
-### 8. Which two digits in the data set are most easy to separate? Quantify the accuracy of the separation with LDA on the test data.
+### Results of LDA Classifier on two arbitrary digits
 
-### 9. SVM (support vector machines) and decision tree classifiers were the state-of-the-art until about 2014. How well do these separate between all ten digits? (see code below to get started).
+| Classifier  | Digits | Accuracy     |
+| ------------|  ---------   |   ---------- |
+| LDA      | 1, 2       |  0.98  |
 
-### 10. Compare the performance between LDA, SVM and decision trees on the hardest and easiest pair of digits to separate (from above).
-
-## Computational Results and Interpretation
-
-### Problem (a) 100 x 100 correlation matrix
-![Fig. 1. Correlation of 100 Images](./Figures/correlation_matrix_100.png)
-
-### Problem (b) Most and least correlated images
-![Fig. 2. High and Low Correlation Images](./Figures/high_low_correlation_faces.jpg)
 
 ### Problem (c) 10 x 10 correlation matrix
 ![Fig. 3. Correlation of 10 Images](./Figures/correlation_matrix_10.jpg)

@@ -247,7 +247,42 @@ ititialize all possible pairs of unique digits (10 choose 2)
     digit_pairs = [(i, j) for i in range(10) for j in range(i + 1, 10)]
 
 loop over pairs of digits, generate mask, apply mask to data,
-concatenate 
+concatenate, and train-test split
+
+    for digit_pair in digit_pairs:
+        dig1 = str(digit_pair[0])
+        dig2 = str(digit_pair[1])
+
+        mask1 = y == dig1
+        mask2 = y == dig2
+
+        X_1 = X[:, mask1]
+        X_2 = X[:, mask2]
+        y_1 = np.zeros(len(X_1[0]))
+        y_2 = np.ones(len(X_2[0]))
+
+        # Merge the images and labels into a single dataset
+        X_dig = np.concatenate((X_1, X_2), axis=1)
+        X_dig = X_dig.T
+        y_dig = np.concatenate((y_1, y_2))
+
+        X_train, X_test, y_train, y_test = train_test_split(X_dig, y_dig, test_size=0.3, random_state=42)
+        data_dict[digit_pair] = (X_train, y_train, X_test, y_test)
+
+initialize accuracy matrix
+
+    acc_for_pairs = np.zeros((10, 10))
+
+loop through digit pairs, acces training and test data, and
+call `fit_and_err` function
+
+    for pair in digit_pairs:
+        train_set = data_dict[pair]
+        accuracy = fit_and_err(lda, train_set, pair)
+        acc_for_pairs[pair[0]][pair[1]] = accuracy
+        acc_for_pairs[pair[1]][pair[0]] = accuracy
+
+
 
 ### 8. Which two digits in the data set are most easy to separate? Quantify the accuracy of the separation with LDA on the test data.
 
@@ -287,6 +322,60 @@ The singular values of the diagonal of $\Sigma$ represent the amount of variance
 | Classifier  | Digits | Accuracy     |
 | ------------|  ---------   |   ---------- |
 | LDA      | 1, 2       |  0.98  |
+
+### Results of LDA Classifier on all 45 digit pairs
+
+| Classifier | Digits | Accuracy |
+|------------|--------|----------|
+| LDA        | (0,1)  | 99.233%  |
+| LDA        | (0,2)  | 98.129%  |
+| LDA        | (0,3)  | 98.932%  |
+| LDA        | (0,4)  | 99.150%  |
+| LDA        | (0,5)  | 97.982%  |
+| LDA        | (0,6)  | 98.936%  |
+| LDA        | (0,7)  | 99.460%  |
+| LDA        | (0,8)  | 98.446%  |
+| LDA        | (0,9)  | 99.110%  |
+| LDA        | (1,2)  | 98.207%  |
+| LDA        | (1,3)  | 98.535%  |
+| LDA        | (1,4)  | 99.229%  |
+| LDA        | (1,5)  | 98.591%  |
+| LDA        | (1,6)  | 99.164%  |
+| LDA        | (1,7)  | 98.770%  |
+| LDA        | (1,8)  | 96.418%  |
+| LDA        | (1,9)  | 99.191%  |
+| LDA        | (2,3)  | 96.509%  |
+| LDA        | (2,4)  | 97.949%  |
+| LDA        | (2,5)  | 97.494%  |
+| LDA        | (2,6)  | 97.620%  |
+| LDA        | (2,7)  | 97.736%  |
+| LDA        | (2,8)  | 96.429%  |
+| LDA        | (2,9)  | 98.399%  |
+| LDA        | (3,4)  | 99.045%  |
+| LDA        | (3,5)  | 95.665%  |
+| LDA        | (3,6)  | 99.025%  |
+| LDA        | (3,7)  | 98.291%  |
+| LDA        | (3,8)  | 95.990%  |
+| LDA        | (3,9)  | 97.825%  |
+| LDA        | (4,5)  | 98.808%  |
+| LDA        | (4,6)  | 98.856%  |
+| LDA        | (4,7)  | 97.616%  |
+| LDA        | (4,8)  | 98.755%  |
+| LDA        | (4,9)  | 96.034%  |
+| LDA        | (5,6)  | 96.790%  |
+| LDA        | (5,7)  | 98.824%  |
+| LDA        | (5,8)  | 95.840%  |
+| LDA        | (5,9)  | 98.016%  |
+| LDA | (6,7) | 99.624% |
+| LDA | (6,8) | 98.103% |
+| LDA | (6,9) | 99.470% |
+| LDA | (7,8) | 98.442% |
+| LDA | (7,9) | 95.580% |
+| LDA | (8,9) | 97.364% |
+
+Classification Accuracy Matrix for digit pairs
+
+![Fig. 5. Accuracy Matrix for Digit Pairs](./Figures/acc_lda_mat.png)
 
 
 ### Problem (c) 10 x 10 correlation matrix

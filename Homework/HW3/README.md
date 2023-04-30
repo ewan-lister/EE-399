@@ -368,11 +368,11 @@ fit DTC classifier
 
 ![Fig. 2. First 12 Modes of U](./Figures/first_12_modes.png)
 
-Because the U modes of the MNIST matrix for a basis for the space in which all of the images exist, we can actually begin to construct legible images by simply taking linear combinations of the U modes. After all, an MNIST image is really just a 784 dimension vector. The first mode of U already accounts for about 44% of the variance between vectors, so by adding the first mode to the second mode, we get something that quite closely resembles a well known digit:
+Because the U modes of the MNIST matrix form a basis for the space in which all of the images exist, we can actually begin to construct legible images by simply taking linear combinations of the U modes. After all, an MNIST image is really just a 784 dimension vector. The first mode of U already accounts for about 44% of the variance between vectors, so by adding the first mode to the second mode, we get something that quite closely resembles a well known digit:
 
 ![Fig. 3. First and Second Mode Added](./Figures/lin_combination_1_2.png)
 
-
+The addition or subtraction of other scaled U modes will allow us to perfectly recreate all of the images within the matrix. In theory we need 784 orthogonal modes to span every vector in A, but to the human eye we likely only need 30-40 modes to recreate images that resemble digits. Any subsequent modes are fitted to very slight variations between images.
 
 ### 3. What is the interpretation of the U, Σ, and V matrices?
 
@@ -382,18 +382,22 @@ Let's refer to the facial images data as matrix A. The columns of U form an orth
 
 The singular values of the diagonal of $\Sigma$ represent the amount of variance captured by each respective vector in U. Consider that taking the dot product of $u_1$ with every column vector in A, and taking the sum of these dot products would be a related value, and $u_2$ would have a smaller value. In fact, in this specific decomposition, the first U mode $u_1$ captures 43.5% of the variance, while all others only capture below 5 percent. This makes sense, given that the data set contains images of integers that are only slightly rotated from vertical, and are typically centered. The rest of the image is white space, and you need only one mode to get almost halfway towards plotting a number.
 
-As for V, V is simply the basis for the row space of A, where each column of V is a vector, and each vector is ranked according to how much variance it's direction captures. SVD forms of A would contain $V^T$, so instead the rows of V are a basis for the row space of A.
+As for V, V is simply the basis for the row space of A, where each column of V is a vector, and each vector is ranked according to how much variance it's direction captures. SVD forms of A would contain $V^T$, so instead the rows of V are a basis for the row space of A. They are equivalently the modes of V, and are perhaps slightly less intuitive in this example because they do not describe the column vectors, which are the images, but instead the vector constructed from taking one pixel from each image. 
 
 
 ### 4. Projection of images onto three modes
 
 ![Fig. 4. Projection of data onto first 3 principal modes](./Figures/proj_3_modes_all.png)
 
-When we project onto modes 2, 3, and 5, we are essentially taking the dot product of one column in A with some label against mode 2, then mode 3, then mode 5. The results of these dot products form a 3d coordinate, we then plot this coordinate and label it according to the digit that described the image. Carry this out for all images in the data, and soon you have a graphical understanding of how all of the points relate to the modes.
+When we project onto modes 2, 3, and 5, we are essentially taking the dot product of one column in A with some label against mode 2, then mode 3, then mode 5. The results of these dot products form a 3d coordinate, we then plot this coordinate and label it according to the digit that described the image. Carry this out for all images in the data, and soon you have a graphical understanding of how all of the points relate to the modes. Notes that the labels on the graph are zero indexed, so Mode 1 on the graph corresponds to mode 2 in reality.
 
-In the plot much of the data 
+In the plot much of the data falls within similar areas, but some distinct features are also present. Examinine the 3d animation below. In general the cloud of points are contained in a cross formation, where a large cloud consisting mostly 8s, 7s, and 9s extends up into the positive levels of correlation to Mode 5. Looking at the two more linear patches of lines, most of the data is clustered at the intersection of these lines, or on the lines themselves. If we were to curve fit functions to these pairs of lines, then we could begin to identify specific parameters which described how to linearly combine the modes to create an image along that line. 
+
 
 ![Fig. 5. Gif of Projection of data onto first 3 principal modes](./Figures/proj_3_modes_all.gif)
+
+If this were an unsupervised learning example, PCA would still be very useful for interpreting the data, as distinct spacial patterns are visible to the human eye even without the labeling of points.
+
 ### **Building and Comparing Classifiers**
 
 ### Results of LDA Classifier on two arbitrary digits

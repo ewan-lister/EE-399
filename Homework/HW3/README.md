@@ -18,7 +18,7 @@ Finally, we provide a summary and conclusions, discussing the key findings of ou
 
 ## Theoretical Background
 
-In this section we will present mathematical theory covering the topics of correlation, eigenpairs, and singular value decomposition. Knowing the basic principles of these techniques will help us to investigate the facial image data.
+In this section we will present mathematical theory covering the topics of classifiers, such as the SVM, LDA, and DTC methods.
 
 ### Support Vector Machines (SVM)
 
@@ -406,6 +406,11 @@ If this were an unsupervised learning example, PCA would still be very useful fo
 | ------------|  ---------   |   ---------- |
 | LDA      | 1, 2       |  0.98  |
 
+Initially we selected two digits which are easy to separate as a benchmark for the LDA classifier. 1 has almost no correlation with the feature space we would associate with horizontal bars found in most numbers. Consider 7, 5, 9, 8, and 2. All of these numbers have some sort of extended line segment at their top. Thus it's likely trivial for an LDA classifier to separate simple vertical line segment 1s from 2s. In the case where images contained a 1 which contains a small bent serif at the top, this would extend the 1 into the aforementioned feature space, not to mention the large serif at the bottom, which resembles that at the base of a 2.
+
+This is just an example of the similarities and differences between digits that would influence how they are classified, if LDA seeks to reduce the dimensionality of data while still specifying the most significant differences between distinct labels, these similarities can decrease its accuracy.
+
+
 ### Results of LDA Classifier on all 45 digit pairs
 
 | Classifier | Digits | Accuracy |
@@ -456,34 +461,32 @@ If this were an unsupervised learning example, PCA would still be very useful fo
 | LDA | (7,9) | 95.580% |
 | LDA | (8,9) | 97.364% |
 
-Classification Accuracy Matrix for digit pairs
+
+Outlined above, we have 45 pairs of digits and the corresponding accuracy under an LDA classifier. Digit pairs with very low classification accuracy are 7 and 9, 5 and 8, 3 and 8, and 5 and 3. As you may know, 8 is a problem child in the digits. 6 and 7 are the easiest digits to separate. The accuracy matrix shown below provides a good illustration of the relationship between each digit. In a way, it is a similarity matrix for 10 digits. The digits with the least classification accuracy have similar features. Note that the diagonal of the matrix was set to 8 so as not to skew the data.
+
+### Classification Accuracy Matrix for digit pairs
 
 ![Fig. 5. Accuracy Matrix for Digit Pairs](./Figures/acc_lda_mat.png)
 
+### Performance of other classifiers
 
-### Problem (c) 10 x 10 correlation matrix
-![Fig. 3. Correlation of 10 Images](./Figures/correlation_matrix_10.jpg)
+| Classifier | Digits | Accuracy |
+|------------|--------|----------|
+| LDA        | (7,9)  | 95.580%  |
+| SVM        | (7,9)  | 98.901%  |
+| DTC        | (7,9)  | 97.568%  |
+| LDA        | (6,7)  | 99.624%  |
+| SVM        | (6,7)  | 99.953%  |
+| DTC        | (6,7)  | 99.459%  |
 
-### Problem (d) First 6 eigenvectors of matrix $Y$
-![Fig. 4. Eigenfaces](./Figures/eigenfaces.jpg)
+LDA, SVM, and DTC classifiers all facilitate the separation of data. However, some classifiers perform better than others in separating the "easiest" and most "difficult" digits. Across the board the SVM classifier outperforms all others. This may be due to the non-linearity of the process. As there is a large degree of variation even within a single digit class, and digits may also share features with other digits, any sort of linear separation will not create the sort of fine precision within feature spaces that non-linear functions could create. This is the power of SVM. 
 
-### (f) Principal eigenvector and first mode comparison
-
-    Norm difference of the absolute values: 5.688808695715053e-16
-![Fig. 5. 1st Eigenvector vs. 1st Mode](./Figures/eigen_vs_1st_mode.jpg)
-
-### (g) First 6 modes and respective percentage of variance captured
-![Fig. 6. First 6 Modes](./Figures/first_6_modes.jpg)
-
+The DTC is in close second, performing 2% better than LDA for the 7 and 9, but performing .2% worse than LDA for 6 and 7. Decision trees are recursive by nature, so once a preliminary division is made, the opportunity to retroactively fix a division between data is not as easy. 
 
 ## Summary and Conclusions
 
-Applying the mathematical techniques of correlation, eigenfactorization, and SVD has allowed us to generate some interesting results from `yalefaces.mat`. In problem (a) we were able to identify two images that are likely to contain the same face simply based on the high correlation between the two, additionally we were able to find faces which are either unrelated, or simply have extremely varied lighting conditions based on their low correlation.
+In conclusion, the analysis of the MNIST dataset using SVD, LDA, SVM, and decision tree classifiers provided valuable insights into the classification and separation of handwritten digits. The singular value spectrum analysis revealed the rank of the digit space, and the interpretation of the U, Σ, and V matrices further clarified the relationships between the digit images. The 3D projection onto selected V-modes offered a visual representation of the data in PCA space, which facilitated the development of linear classifiers for digit identification.
 
-Isolating the eigenvectors of `yalefaces.mat` in problem (d) revealed a series of images that resemble primitive faces, becoming less and less endearing as the scaling value of the eigenvector decreases. Interestingly, some faces appear to resemble even functions, while others are odd. 
+The classification performance varied depending on the chosen digits and classification techniques. Notably, digits 6 and 7 were the easiest to separate, while digits 9 and 7 presented the greatest challenge. Among the classifiers tested, the SVM classifier demonstrated the best overall performance in separating all ten digits, outperforming both LDA and decision tree classifiers, particularly for the hardest and easiest pairs of digits to separate.
 
-When comparing the highest eigenvalue eigenvector with the first mode of the SVD in problem (f), another interesting result arises in that the two images are nearly identical, having a miniscule norm difference. In fact, all 6 modes appear very similar, except that some have their sign flipped. This is explainable based on the fact that in SVD we only allow $\Sigma$ to contain positive singular values. This similarity leads one to conclude that the modes of the U matrix in SVD are similar to eigen values in a matrix. Except that they exist for all matrices.
-
-As a general note, another special quality of the eigenpairs and SVD technique was that they allowed us to reduce the dimensionality of the data set, while still preserving most of the variance associated with the original data set. With only 6 SVD modes, we can reconstruct the individual features of each image within 93.89% of the original, which for all intents and purposes, makes these techniques robust for compression.
-
-By applying mathematical techniques that allow for fast comparison and reduction in dimensionality of the data. We can store, understand, and utilize the data much faster, and much more clearly than without.
+The results underscore the importance of selecting appropriate classification techniques for specific tasks and highlight the effectiveness of SVM classifiers for this particular dataset. Additionally, the report emphasized the importance of visualizations and comparisons between training and test sets to ensure reliable and generalizable conclusions. Future work could explore other classification algorithms and feature extraction methods to further improve the performance of digit classification and recognition tasks.

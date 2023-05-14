@@ -34,28 +34,44 @@ where $h_1$ and $h_2$ are the hidden layer outputs, and $\hat{y}$ is the predict
 
 In practice, the weights and biases of the network are learned through a process called backpropagation, where the network is trained on a set of training data to minimize the difference between the predicted outputs and the desired outputs. This process involves computing the gradient of the loss function with respect to the weights and biases, and updating them using an optimization algorithm such as stochastic gradient descent (SGD).
 
+## Long Short-Term Memory (LSTM) Networks
+
+Long Short-Term Memory (LSTM) networks are a type of recurrent neural network (RNN) that are designed to avoid the long-term dependency problem. This is achieved through their unique cell state structure which allows them to maintain and access information over long sequences, making them particularly effective for tasks involving sequential data such as time series analysis, natural language processing, and more.
+
+The core idea behind LSTMs is the cell state, which runs straight down the entire chain, with only minor linear interactions. It's the LSTM's ability to regulate the cell state's information that makes it so special. At each step in the sequence, there are structures called gates that regulate the information flow into and out of the cell state. These gates are a way to optionally let information through, and they are composed out of a sigmoid neural net layer and a pointwise multiplication operation. The sigmoid layer outputs numbers between zero and one, describing how much of each component should be let through. A value of zero means "let nothing through," while a value of one means "let everything through!" An LSTM has three of these gates: the forget gate, the input gate, and the output gate. These are defined mathematically as follows:
+
+\[
+    f_t = \sigma(W_f \cdot [h_{t-1}, x_t] + b_f)
+\]
+\[
+i_t = \sigma(W_i \cdot [h_{t-1}, x_t] + b_i)
+\]
+\[
+o_t = \sigma(W_o \cdot [h_{t-1}, x_t] + b_o)
+\]
+
+where $f_t$, $i_t$, and $o_t$ are the forget, input, and output gates at time $t$, respectively, $\sigma$ is the sigmoid function, $W$ and $b$ are the weight and bias parameters, $h_{t-1}$ is the hidden state from the previous time step, and $x_t$ is the input at the current time step. The forget gate determines how much of the past information (i.e., the cell state) to retain, the input gate decides how much of the current information to store in the cell state, and the output gate determines how much of the information in the cell state to reveal to the next layers in the network.
 
 ## Algorithm Implementation and Development
 
-# imports
-import torch
-import torch.nn as nn
-import torchvision.datasets as datasets
-import torchvision.transforms as transforms
-import scipy.io as sio
-import numpy as np
-import matplotlib.pyplot as plt
-from sklearn.linear_model import Lasso
-from sklearn.decomposition import PCA
-from scipy.io import loadmat
-from sklearn.datasets import fetch_openml
+    import torch
+    import torch.nn as nn
+    import torchvision.datasets as datasets
+    import torchvision.transforms as transforms
+    import scipy.io as sio
+    import numpy as np
+    import matplotlib.pyplot as plt
+    from sklearn.linear_model import Lasso
+    from sklearn.decomposition import PCA
+    from scipy.io import loadmat
+    from sklearn.datasets import fetch_openml
 
-X = torch.arange(0, 31, dtype=torch.float32).reshape(-1, 1)
-Y = torch.tensor([30, 35, 33, 32, 34, 37, 39, 38, 36, 36, 37, 39, 42, 45, 45, 41,
-                  40, 39, 42, 44, 47, 49, 50, 49, 46, 48, 50, 53, 55, 54, 53],
-                 dtype=torch.float32).reshape(-1, 1)
+    X = torch.arange(0, 31, dtype=torch.float32).reshape(-1, 1)
+    Y = torch.tensor([30, 35, 33, 32, 34, 37, 39, 38, 36, 36, 37, 39, 42, 45, 45, 41,
+                    40, 39, 42, 44, 47, 49, 50, 49, 46, 48, 50, 53, 55, 54, 53],
+                    dtype=torch.float32).reshape(-1, 1)
 
-data = dict(zip(X, Y))
+    data = dict(zip(X, Y))
 
 ### (i) Fit the data to a three layer feed forward neural network.
 

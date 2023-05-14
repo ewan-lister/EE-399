@@ -9,3 +9,5 @@ Code and assignments completed for EE 399, a machine learning course
 
 [HW 3](./Homework/HW3/README.md)
 
+[HW 4](./Homework/HW4/README.md)
+

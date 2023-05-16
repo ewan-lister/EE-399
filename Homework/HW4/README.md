@@ -40,15 +40,10 @@ Long Short-Term Memory (LSTM) networks are a type of recurrent neural network (R
 
 The core idea behind LSTMs is the cell state, which runs straight down the entire chain, with only minor linear interactions. It's the LSTM's ability to regulate the cell state's information that makes it so special. At each step in the sequence, there are structures called gates that regulate the information flow into and out of the cell state. These gates are a way to optionally let information through, and they are composed out of a sigmoid neural net layer and a pointwise multiplication operation. The sigmoid layer outputs numbers between zero and one, describing how much of each component should be let through. A value of zero means "let nothing through," while a value of one means "let everything through!" An LSTM has three of these gates: the forget gate, the input gate, and the output gate. These are defined mathematically as follows:
 
-\[
-    f_t = \sigma(W_f \cdot [h_{t-1}, x_t] + b_f)
-\]
-\[
-i_t = \sigma(W_i \cdot [h_{t-1}, x_t] + b_i)
-\]
-\[
-o_t = \sigma(W_o \cdot [h_{t-1}, x_t] + b_o)
-\]
+
+    $$f_t = \sigma(W_f \cdot [h_{t-1}, x_t] + b_f)$$
+    $$i_t = \sigma(W_i \cdot [h_{t-1}, x_t] + b_i)$$
+    $$o_t = \sigma(W_o \cdot [h_{t-1}, x_t] + b_o)$$
 
 where $f_t$, $i_t$, and $o_t$ are the forget, input, and output gates at time $t$, respectively, $\sigma$ is the sigmoid function, $W$ and $b$ are the weight and bias parameters, $h_{t-1}$ is the hidden state from the previous time step, and $x_t$ is the input at the current time step. The forget gate determines how much of the past information (i.e., the cell state) to retain, the input gate decides how much of the current information to store in the cell state, and the output gate determines how much of the information in the cell state to reveal to the next layers in the network.
 

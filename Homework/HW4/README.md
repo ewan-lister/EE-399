@@ -143,9 +143,247 @@ where $f_t$, $i_t$, and $o_t$ are the forget, input, and output gates at time $t
 
     check_train_test_error(x_train, y_train, x_test, y_test)
 
+### (iii) Repeat (iii) but use the first 10 and last 10 data points as training data. Then fit the model to the test data (which are the 10 held out middle data points). Compare these results to (iii)
+
+    # isolate first and last 10 training points
+    x_train = torch.cat([X[0:10], X[20:31]])
+    y_train = torch.cat([Y[0:10], Y[20:31]])
+    x_test = X[10:20]
+    y_test = Y[10:20]
+
+    optimizer = torch.optim.SGD(net.parameters(), lr=0.01)
+
+    # train network on first and last 10 data points, examine progress of SGD via print statements
+    num_epochs = 50
+    for epoch in range(num_epochs):
+        for i, (x) in enumerate(x_train):
+            optimizer.zero_grad()
+            outputs = net(x)
+            loss = criterion(outputs, y_train[i])
+            loss.backward()
+            optimizer.step()
+            
+            if (i + 1) % 20 == 0:
+                print ('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}'.format(epoch+1, num_epochs, i+1, 20, loss.item()))
+
+    check_train_test_error(x_train, y_train, x_test, y_test)
+
+### (iv) Compare the models fit in homework one to the neural networks in (ii) and (iii)
+
+Similarly to the curve fitting in homework 1, the neural network does a poor job of making any extrapolations about its test data if the data is outside of the domain of the training data. For example, the network did well when test data contained the 10 points between point 9 and point 20, but poorly when the test data was that from 20 to 31, which is unbounded by any training data. Thus is performs very similarly to the curve fitting in homework 1. However, the loss, for each value is still much greater in the case of the neural network.
+
+
+## II Now train a feedforward neural network on the MNIST data set. You will start by performing the following analysis:
+
+### (i) Compute the first 20 PCA modes of the digit images.
+
+    # fetch MNIST dataset
+    mnist = fetch_openml('mnist_784', version=1)
+
+    # Convert the data and labels into numpy arrays
+    data = np.array(mnist['data'])
+    labels = np.array(mnist['target'])
+
+    # apply PCA transformation onto the first 20 modes
+    pca = PCA(n_components=20)
+
+    print(np.shape(data))
+    data_pca_1 = pca.fit_transform(data)
+
+    from sklearn.model_selection import train_test_split
+    print(np.shape(data_pca_1))
+    print(np.shape(labels))
+
+
+### (ii) Build a feed-forward neural network to classify the digits. Compare the results of the neural network against LSTM, SVM (support vector machines) and decision tree classifiers.
+
+    # separate training and test data for use in LSTM, SVM, and DTC classifiers
+    data_train, data_test, label_train, label_test = train_test_split(data_pca_1, labels, test_size=0.3, random_state=42)
+
+    # convert labels to ints
+    label_train = label_train.astype(np.int16)
+    label_test = label_test.astype(np.int16)
+
+### testing neural network on MNIST data
+
+    import torch
+    import torch.nn as nn
+    import torch.optim as optim
+    from torchvision import datasets, transforms
+
+    # Define the hyperparameters
+    batch_size = 128
+    learning_rate = 0.001
+    num_epochs = 10
+
+    # Download and prepare the MNIST dataset
+    train_dataset = datasets.MNIST(root='./data', train=True, transform=transforms.ToTensor(), download=True)
+    test_dataset = datasets.MNIST(root='./data', train=False, transform=transforms.ToTensor())
+
+    # Create data loaders for the training and testing datasets
+    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
+
+    # Define the model architecture
+    class FeedforwardNN(nn.Module):
+        def __init__(self):
+            super(FeedforwardNN, self).__init__()
+            self.fc1 = nn.Linear(784, 256)
+            self.fc2 = nn.Linear(256, 128)
+            self.fc3 = nn.Linear(128, 10)
+            
+        def forward(self, x):
+            x = x.view(-1, 784)
+            x = torch.relu(self.fc1(x))
+            x = torch.relu(self.fc2(x))
+            x = self.fc3(x)
+            return x
+
+    # Initialize the model and optimizer
+    model = FeedforwardNN()
+    optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+
+    # Train the model
+    for epoch in range(num_epochs):
+        for batch_idx, (data, target) in enumerate(train_loader):
+            optimizer.zero_grad()
+            output = model(data)
+            loss = nn.CrossEntropyLoss()(output, target)
+            loss.backward()
+            optimizer.step()
+            
+            if batch_idx % 100 == 0:
+                print('Epoch {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
+                    epoch, batch_idx * len(data), len(train_loader.dataset),
+                    100. * batch_idx / len(train_loader), loss.item()))
+
+    # Evaluate the model on the test set
+    test_loss = 0
+    correct = 0
+    with torch.no_grad():
+        for data, target in test_loader:
+            output = model(data)
+            test_loss += nn.CrossEntropyLoss()(output, target).item()
+            pred = output.argmax(dim=1, keepdim=True)
+            correct += pred.eq(target.view_as(pred)).sum().item()
+
+    test_loss /= len(test_loader.dataset)
+    accuracy = 100. * correct / len(test_loader.dataset)
+    print('Test set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)'.format(
+        test_loss, correct, len(test_loader.dataset), accuracy))
+
+### testing LSTM on MNIST data
+
+    import torch
+    import torch.nn as nn
+    import torch.optim as optim
+    from torchvision import datasets, transforms
+
+    # Define the hyperparameters
+    batch_size = 128
+    learning_rate = 0.001
+    num_epochs = 10
+    hidden_size = 128
+    num_layers = 2
+
+    # Download and prepare the MNIST dataset
+    train_dataset = datasets.MNIST(root='./data', train=True, transform=transforms.ToTensor(), download=True)
+    test_dataset = datasets.MNIST(root='./data', train=False, transform=transforms.ToTensor())
+
+    # Create data loaders for the training and testing datasets
+    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
+
+    # Define the LSTM architecture
+    class LSTM(nn.Module):
+        def __init__(self):
+            super(LSTM, self).__init__()
+            self.lstm = nn.LSTM(input_size=28, hidden_size=hidden_size, num_layers=num_layers, batch_first=True)
+            self.fc = nn.Linear(hidden_size, 10)
+            
+        def forward(self, x):
+            h0 = torch.zeros(num_layers, x.size(0), hidden_size).to(x.device)
+            c0 = torch.zeros(num_layers, x.size(0), hidden_size).to(x.device)
+            out, (h_n, c_n) = self.lstm(x, (h0, c0))
+            out = self.fc(h_n[-1])
+            return out
+
+    # Initialize the model and optimizer
+    model = LSTM()
+    optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+
+    # Train the model
+    for epoch in range(num_epochs):
+        for batch_idx, (data, target) in enumerate(train_loader):
+            optimizer.zero_grad()
+            data = data.view(batch_size, 28, 28)
+            output = model(data)
+            loss = nn.CrossEntropyLoss()(output, target)
+            loss.backward()
+            optimizer.step()
+            
+            if batch_idx % 100 == 0:
+                print('Epoch {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
+                    epoch, batch_idx * len(data), len(train_loader.dataset),
+                    100. * batch_idx / len(train_loader), loss.item()))
+
+    # Evaluate the model on the test set
+    test_loss = 0
+    correct = 0
+    with torch.no_grad():
+        for data, target in test_loader:
+            data = data.view(data.shape[0], 28, 28)
+            output = model(data)
+            test_loss += nn.CrossEntropyLoss()(output, target).item()
+            pred = output.argmax(dim=1, keepdim=True)
+            correct += pred.eq(target.view_as(pred)).sum().item()
+
+    test_loss /= len(test_loader.dataset)
+    accuracy = 100. * correct / len(test_loader.dataset)
+    print('Test set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)'.format(
+        test_loss, correct, len(test_loader.dataset), accuracy))
+
+### fitting an SVM classifier
+
+    from sklearn.metrics import accuracy_score
+    from sklearn.svm import SVC
+    # Train a linear classifier
+    clf = SVC()
+    clf.fit(data_train, label_train)
+
+    # Evaluate the performance on the test set
+    y_pred = clf.predict(data_test)
+    acc = accuracy_score(label_test, y_pred)
+    print(f"Accuracy for SVM: {acc:.2f}")
+
+### fitting a DTC classifier
+
+    from sklearn.tree import DecisionTreeClassifier
+
+    # Train a DTC classifier
+    clf = DecisionTreeClassifier()
+    clf.fit(data_train, label_train)
+
+    # Evaluate the performance on the test set
+    y_pred = clf.predict(data_test)
+    acc = accuracy_score(label_test, y_pred)
+    print(f"Accuracy for DTC: {acc:.2f}")
+
 ## Computational Results and Interpretation
 
-### **Analysis**
+### **Part 1**
+
+### Training a 3 Layer FNN on all 30 points
+
+### Training a 3 Layer FNN on first 20 points
+
+### Training a 3 Layer FNN on First and Last 10 points
+
+### Comparing models to HW1 performance
+
+### **Part 2**
+
+
 
 ### 2. Singular Value Spectrum and Modes
 ![Fig. 1. First 50 Singular Values](./Figures/first_50_singular_values.png)

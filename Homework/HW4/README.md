@@ -41,13 +41,15 @@ Long Short-Term Memory (LSTM) networks are a type of recurrent neural network (R
 The core idea behind LSTMs is the cell state, which runs straight down the entire chain, with only minor linear interactions. It's the LSTM's ability to regulate the cell state's information that makes it so special. At each step in the sequence, there are structures called gates that regulate the information flow into and out of the cell state. These gates are a way to optionally let information through, and they are composed out of a sigmoid neural net layer and a pointwise multiplication operation. The sigmoid layer outputs numbers between zero and one, describing how much of each component should be let through. A value of zero means "let nothing through," while a value of one means "let everything through!" An LSTM has three of these gates: the forget gate, the input gate, and the output gate. These are defined mathematically as follows:
 
 
-    $$f_t = \sigma(W_f \cdot [h_{t-1}, x_t] + b_f)$$
-    $$i_t = \sigma(W_i \cdot [h_{t-1}, x_t] + b_i)$$
-    $$o_t = \sigma(W_o \cdot [h_{t-1}, x_t] + b_o)$$
+$$f_t = \sigma(W_f \cdot [h_{t-1}, x_t] + b_f)$$
+$$i_t = \sigma(W_i \cdot [h_{t-1}, x_t] + b_i)$$
+$$o_t = \sigma(W_o \cdot [h_{t-1}, x_t] + b_o)$$
 
 where $f_t$, $i_t$, and $o_t$ are the forget, input, and output gates at time $t$, respectively, $\sigma$ is the sigmoid function, $W$ and $b$ are the weight and bias parameters, $h_{t-1}$ is the hidden state from the previous time step, and $x_t$ is the input at the current time step. The forget gate determines how much of the past information (i.e., the cell state) to retain, the input gate decides how much of the current information to store in the cell state, and the output gate determines how much of the information in the cell state to reveal to the next layers in the network.
 
 ## Algorithm Implementation and Development
+
+import in relevant libraries, we need all of the classifier models from canonical ML, as well as torch
 
     import torch
     import torch.nn as nn
@@ -60,6 +62,10 @@ where $f_t$, $i_t$, and $o_t$ are the forget, input, and output gates at time $t
     from sklearn.decomposition import PCA
     from scipy.io import loadmat
     from sklearn.datasets import fetch_openml
+    from sklearn.model_selection import train_test_split
+    import torch.optim as optim
+
+initialize X and Y data in tensor form
 
     X = torch.arange(0, 31, dtype=torch.float32).reshape(-1, 1)
     Y = torch.tensor([30, 35, 33, 32, 34, 37, 39, 38, 36, 36, 37, 39, 42, 45, 45, 41,
@@ -70,7 +76,8 @@ where $f_t$, $i_t$, and $o_t$ are the forget, input, and output gates at time $t
 
 ### (i) Fit the data to a three layer feed forward neural network.
 
-    # Define the neural network architecture
+define the neural network architecture
+
     class ThreeLayerNet(nn.Module):
         def __init__(self):
             super().__init__()
@@ -84,19 +91,16 @@ where $f_t$, $i_t$, and $o_t$ are the forget, input, and output gates at time $t
             x = self.fc3(x)
             return x
 
-    # initialize network
+initialize learning rate, network, optimizer, and loss criterion
+
+    lr = 0.0001
     net = ThreeLayerNet()
-
-    # use SGD for fitting
     optimizer = torch.optim.SGD(net.parameters(), lr=0.01)
-
-    # loss function
     criterion = nn.MSELoss()
 
-    # create training data loader
-    train_loader = torch.utils.data.DataLoader(dataset=data, batch_size=1, shuffle=True)
+train the neural network using gradient descent, no batching, and print loss after all pairs have been
+back propogated
 
-    # Train the neural network using gradient descent
     num_epochs = 15
     for epoch in range(num_epochs):
         for i, (x) in enumerate(X):
@@ -111,6 +115,8 @@ where $f_t$, $i_t$, and $o_t$ are the forget, input, and output gates at time $t
 
 ### (ii) Using the first 20 data points as training data, fit the neural network. Compute the least-square error for each of these over the training points. Then compute the least square error of these models on the test data which are the remaining 10 data points.
 
+define a function which can be used to check error quickly on training and test data
+
     def check_train_test_error(x_train, y_train, x_test, y_test):
         for i, (x) in enumerate(x_train):
             outputs = net(x)
@@ -122,13 +128,16 @@ where $f_t$, $i_t$, and $o_t$ are the forget, input, and output gates at time $t
             error = criterion(outputs, y_test[i])
             print('Test error for x = {}, y = {} : {:.4f}'.format(x, y_test[i], error))
 
-    # isolate first 20 data points
+isolate first 20 data points
+
     x_train = X[0:20]
     y_train = Y[0:20]
     x_test = X[20:31]
     y_test = Y[20:31]
 
-    # train network on first 20 data points, examine progress of SGD via print statements
+
+train network on first 20 data points, examine progress of SGD via print statements
+
     num_epochs = 15
     for epoch in range(num_epochs):
         for i, (x) in enumerate(x_train):
@@ -141,19 +150,25 @@ where $f_t$, $i_t$, and $o_t$ are the forget, input, and output gates at time $t
             if (i + 1) % 20 == 0:
                 print ('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}'.format(epoch+1, num_epochs, i+1, 20, loss.item()))
 
+check error on training and test data
+
     check_train_test_error(x_train, y_train, x_test, y_test)
 
 ### (iii) Repeat (iii) but use the first 10 and last 10 data points as training data. Then fit the model to the test data (which are the 10 held out middle data points). Compare these results to (iii)
 
-    # isolate first and last 10 training points
+isolate first and last 10 training points
+
     x_train = torch.cat([X[0:10], X[20:31]])
     y_train = torch.cat([Y[0:10], Y[20:31]])
     x_test = X[10:20]
     y_test = Y[10:20]
 
+set optimizer
+
     optimizer = torch.optim.SGD(net.parameters(), lr=0.01)
 
-    # train network on first and last 10 data points, examine progress of SGD via print statements
+train network on first and last 10 data points, examine progress of SGD via print statements
+
     num_epochs = 50
     for epoch in range(num_epochs):
         for i, (x) in enumerate(x_train):
@@ -166,6 +181,8 @@ where $f_t$, $i_t$, and $o_t$ are the forget, input, and output gates at time $t
             if (i + 1) % 20 == 0:
                 print ('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}'.format(epoch+1, num_epochs, i+1, 20, loss.item()))
 
+check error on training data and middle 10 points
+
     check_train_test_error(x_train, y_train, x_test, y_test)
 
 ### (iv) Compare the models fit in homework one to the neural networks in (ii) and (iii)
@@ -177,54 +194,35 @@ Similarly to the curve fitting in homework 1, the neural network does a poor job
 
 ### (i) Compute the first 20 PCA modes of the digit images.
 
-    # fetch MNIST dataset
-    mnist = fetch_openml('mnist_784', version=1)
+fetch MNIST dataset, convert data and labels into numpy arrays
 
-    # Convert the data and labels into numpy arrays
+    mnist = fetch_openml('mnist_784', version=1)
     data = np.array(mnist['data'])
     labels = np.array(mnist['target'])
 
-    # apply PCA transformation onto the first 20 modes
+apply PCA transformation onto the first 20 modes
+
     pca = PCA(n_components=20)
-
-    print(np.shape(data))
     data_pca_1 = pca.fit_transform(data)
-
-    from sklearn.model_selection import train_test_split
-    print(np.shape(data_pca_1))
-    print(np.shape(labels))
 
 
 ### (ii) Build a feed-forward neural network to classify the digits. Compare the results of the neural network against LSTM, SVM (support vector machines) and decision tree classifiers.
 
-    # separate training and test data for use in LSTM, SVM, and DTC classifiers
-    data_train, data_test, label_train, label_test = train_test_split(data_pca_1, labels, test_size=0.3, random_state=42)
+separate training and test data for use in LSTM, SVM, and DTC classifiers. convert labels to ints
 
-    # convert labels to ints
+    data_train, data_test, label_train, label_test = train_test_split(data_pca_1, labels, test_size=0.3, random_state=42)
     label_train = label_train.astype(np.int16)
     label_test = label_test.astype(np.int16)
 
 ### testing neural network on MNIST data
 
-    import torch
-    import torch.nn as nn
-    import torch.optim as optim
-    from torchvision import datasets, transforms
-
-    # Define the hyperparameters
+define batch size, learning rate, and epoch number as the hyperparameters
     batch_size = 128
     learning_rate = 0.001
     num_epochs = 10
 
-    # Download and prepare the MNIST dataset
-    train_dataset = datasets.MNIST(root='./data', train=True, transform=transforms.ToTensor(), download=True)
-    test_dataset = datasets.MNIST(root='./data', train=False, transform=transforms.ToTensor())
+define the model architecture
 
-    # Create data loaders for the training and testing datasets
-    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
-    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
-
-    # Define the model architecture
     class FeedforwardNN(nn.Module):
         def __init__(self):
             super(FeedforwardNN, self).__init__()
@@ -373,17 +371,31 @@ Similarly to the curve fitting in homework 1, the neural network does a poor job
 
 ### **Part 1**
 
-### Training a 3 Layer FNN on all 30 points
+### Training a 3 Layer FFNN on all 30 points
 
-### Training a 3 Layer FNN on first 20 points
+![Fig. 1. First 50 Singular Values](./Figures/first_50_singular_values.png)
 
-### Training a 3 Layer FNN on First and Last 10 points
+### Training a 3 Layer FFNN on first 20 points
+
+![Fig. 1. First 50 Singular Values](./Figures/first_50_singular_values.png)
+
+### Training a 3 Layer FFNN on First and Last 10 points
+
+![Fig. 1. First 50 Singular Values](./Figures/first_50_singular_values.png)
 
 ### Comparing models to HW1 performance
 
+![Fig. 1. First 50 Singular Values](./Figures/first_50_singular_values.png)
+
 ### **Part 2**
 
+### Build a FFNN for classifying MNIST Data
 
+![Fig. 1. First 50 Singular Values](./Figures/first_50_singular_values.png)
+
+### Comparison with LSTM, SVM, and DTC
+
+![Fig. 1. First 50 Singular Values](./Figures/first_50_singular_values.png)
 
 ### 2. Singular Value Spectrum and Modes
 ![Fig. 1. First 50 Singular Values](./Figures/first_50_singular_values.png)

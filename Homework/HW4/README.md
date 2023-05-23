@@ -347,26 +347,26 @@ evaluate the model on the test set
 
 ### fitting an SVM classifier
 
-    from sklearn.metrics import accuracy_score
-    from sklearn.svm import SVC
-    # Train a linear classifier
+train a support vector machine classifier
+
     clf = SVC()
     clf.fit(data_train, label_train)
 
-    # Evaluate the performance on the test set
+evaluate the performance on the test set
+
     y_pred = clf.predict(data_test)
     acc = accuracy_score(label_test, y_pred)
     print(f"Accuracy for SVM: {acc:.2f}")
 
 ### fitting a DTC classifier
 
-    from sklearn.tree import DecisionTreeClassifier
+train a decision tree classifier
 
-    # Train a DTC classifier
     clf = DecisionTreeClassifier()
     clf.fit(data_train, label_train)
 
-    # Evaluate the performance on the test set
+evaluate the performance on the test set
+
     y_pred = clf.predict(data_test)
     acc = accuracy_score(label_test, y_pred)
     print(f"Accuracy for DTC: {acc:.2f}")
@@ -379,6 +379,8 @@ evaluate the model on the test set
 
 ![Fig. 1. FNN Training on scatter distribution](./Figures/fnnepochs.jpg)
 
+| ML Model Used| # of data points| MSE |
+| Neural Network | 30
 ### Training a 3 Layer FFNN on first 20 points
 
 ![Fig. 2. FNN Training on x = {0 - 20} points in distribution](./Figures/fnnepochs2.jpg)

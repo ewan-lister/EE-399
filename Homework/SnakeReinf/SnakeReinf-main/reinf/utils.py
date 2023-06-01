@@ -15,6 +15,7 @@ def perform_mc(env, num_episodes, epsilon, gamma, rewards):
     q_table = defaultdict(lambda: np.zeros(action_space_size))
     state_action_count = defaultdict(lambda: np.zeros(action_space_size))
     for _ in tqdm(range(num_episodes)):
+        episode_rewards_norm = []
         episode_rewards = []
         episode_states = []
         episode_actions = []
@@ -32,7 +33,7 @@ def perform_mc(env, num_episodes, epsilon, gamma, rewards):
             # 0 if no apple is taken
             # 1 if apple is taken
             # 10 if the player won (screen full of snake)
-
+            episode_rewards_norm.append(reward)
             if reward == -1:
                 reward = rewards[0]
             elif reward == 0:
@@ -55,7 +56,9 @@ def perform_mc(env, num_episodes, epsilon, gamma, rewards):
                 G = sum([episode_rewards[j]*gamma**(j-i) for j in range(i, len(episode_rewards))])
                 state_action_count[state][action] += 1
                 q_table[state][action] += (G - q_table[state][action]) / state_action_count[state][action]
-
+    mask_array = np.array(episode_rewards_norm)
+    # pos_mask = mask_array[mask_array > 0]
+    print(sum(mask_array) / len(mask_array))
     return q_table
 
 def epsilon_greedy_policy(state, actions, q_table, epsilon):
@@ -69,6 +72,7 @@ def show_games(env, n_games, q_table, time_between_plays=0.2):
     assert env.with_rendering, "You need to activate rendering on the \
     environment to see the game"
 
+    
     total_reward = 0
     for i in range(n_games):
         state, _ = env.reset()
@@ -88,3 +92,4 @@ def show_games(env, n_games, q_table, time_between_plays=0.2):
         print(f"Reward on game {i} was {episode_reward}")
 
         total_reward += episode_reward
+        print(f"Average Reward: {total_reward / (i + 1):.3f}")

@@ -69,8 +69,8 @@ def epsilon_greedy_policy(state, actions, q_table, epsilon):
         return max(q_values, key=q_values.get)
 
 def show_games(env, n_games, q_table, time_between_plays=0.2):
-    assert env.with_rendering, "You need to activate rendering on the \
-    environment to see the game"
+    #assert env.with_rendering, "You need to activate rendering on the \
+    #environment to see the game"
 
     
     total_reward = 0
@@ -80,7 +80,7 @@ def show_games(env, n_games, q_table, time_between_plays=0.2):
         episode_reward = 0
         done = False
         while not done:
-            time.sleep(time_between_plays)
+            #time.sleep(time_between_plays)
             actions = env.get_valid_actions(state)
             action = epsilon_greedy_policy(tuple(tuple(x) for x in state),
                                            actions,
@@ -93,3 +93,4 @@ def show_games(env, n_games, q_table, time_between_plays=0.2):
 
         total_reward += episode_reward
         print(f"Average Reward: {total_reward / (i + 1):.3f}")
+    print(f"Final reward over 100 trials: {total_reward / (i + 1):.3f}")

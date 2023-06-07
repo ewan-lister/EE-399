@@ -379,8 +379,6 @@ evaluate the performance on the test set
 
 ![Fig. 1. FNN Training on scatter distribution](./Figures/fnnepochs.jpg)
 
-| ML Model Used| # of data points| MSE |
-| Neural Network | 30
 ### Training a 3 Layer FFNN on first 20 points
 
 ![Fig. 2. FNN Training on x = {0 - 20} points in distribution](./Figures/fnnepochs2.jpg)
@@ -391,6 +389,7 @@ evaluate the performance on the test set
 
 ### Comparing models to HW1 performance
 
+Similarly to the curve fitting in homework 1, the neural network does a poor job of making any extrapolations about its test data if the data is outside of the domain of the training data. For example, the network did well when test data contained the 10 points between point 9 and point 20, but poorly when the test data was that from 20 to 31, which is unbounded by any training data. Thus is performs very similarly to the curve fitting in homework 1. However, the loss, for each value is still much greater in the case of the neural network.
 
 ### **Part 2**
 
@@ -402,10 +401,23 @@ evaluate the performance on the test set
 
 ![Fig. 4. LSTM Training on MNIST data](./Figures/lstmMNIST1.jpg)
 
+| Accuracy for SVM |
+| ---------------- |
+| 0.97             |
+
+| Accuracy for DTC |
+| ---------------- |
+| 0.84             |
+
+
 ## Summary and Conclusions
 
-In conclusion, the analysis of the MNIST dataset using SVD, LDA, SVM, and decision tree classifiers provided valuable insights into the classification and separation of handwritten digits. The singular value spectrum analysis revealed the rank of the digit space, and the interpretation of the U, Σ, and V matrices further clarified the relationships between the digit images. The 3D projection onto selected V-modes offered a visual representation of the data in PCA space, which facilitated the development of linear classifiers for digit identification.
+In conclusion, this report has presented an analysis of two different tasks involving the use of feedforward neural networks. 
 
-The classification performance varied depending on the chosen digits and classification techniques. Notably, digits 6 and 7 were the easiest to separate, while digits 9 and 7 presented the greatest challenge. Among the classifiers tested, the SVM classifier demonstrated the best overall performance in separating all ten digits, outperforming both LDA and decision tree classifiers, particularly for the hardest and easiest pairs of digits to separate.
+Firstly, in Task I, a three-layer feedforward neural network was fitted to a given dataset. The network was trained using the first 20 data points, and the least-square error was computed over the training points. The trained model was then evaluated on the remaining 10 data points to calculate the least square error on the test data. Additionally, the training process was repeated using the first 10 and last 10 data points as training data, and the model was tested on the held-out middle data points. A comparison was made between the results obtained from these different training configurations.
 
-The results underscore the importance of selecting appropriate classification techniques for specific tasks and highlight the effectiveness of SVM classifiers for this particular dataset. Additionally, the report emphasized the importance of visualizations and comparisons between training and test sets to ensure reliable and generalizable conclusions. Future work could explore other classification algorithms and feature extraction methods to further improve the performance of digit classification and recognition tasks.
+Secondly, in Task II, a feedforward neural network was trained on the MNIST dataset. The first 20 principal component analysis (PCA) modes of the digit images were computed, and a feedforward neural network was built to classify the digits. The performance of the neural network was compared against other classifiers such as LSTM, SVM, and decision trees.
+
+Overall, these tasks provided valuable insights into the application of feedforward neural networks in different scenarios. The analysis of the data from Task I showcased the impact of training data selection on model performance, highlighting the importance of proper data partitioning. Task II demonstrated the effectiveness of a feedforward neural network in digit classification, with a comparison against other classifiers revealing the relative strengths and weaknesses of each approach.
+
+By completing these tasks, we gained hands-on experience in implementing and training feedforward neural networks, as well as exploring their performance in different contexts. The findings from this report contribute to our understanding of neural network modeling and provide a foundation for further exploration and refinement of these techniques.

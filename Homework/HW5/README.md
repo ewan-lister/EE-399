@@ -22,13 +22,11 @@ What modification do we need to make in order to train time dependent models? We
 
 Recurrent Neural Networks (RNNs) are a class of neural networks designed to process sequential data by maintaining an internal hidden state that captures information from previous time steps. The mathematical theory behind RNNs involves the concept of recurrent connections and the unfolding of the network through time.
 
-Let's consider a time series input sequence of length T, denoted by $\mathbf{x} = (\mathbf{x}_1, \mathbf{x}_2, \ldots, \mathbf{x}_T)$, where $\mathbf{x}_t$ represents the input at time step t. An RNN updates its hidden state $\mathbf{h}_t$ at each time step based on the current input $\mathbf{x_t}$ and the previous hidden state $\mathbf{h}_{t-1}$.
+Let's consider a time series input sequence of length T, denoted by $\mathbf{x} = (\mathbf{x}_1, \mathbf{x}_2, \ldots, \mathbf{x}_T)$, where $\mathbf{x}_t$ represents the input at time step t. An RNN updates its hidden state $\mathbf{x}_t$ at each time step based on the current input $\mathbf{x}_t$ and the previous hidden state $\mathbf{h}_{t-1}$.
 
 The hidden state $\mathbf{h}_t$ of an RNN is computed using the following equation:
 
-$$
-\mathbf{h_t} = \sigma(\mathbf{W}_{\text{in}} \mathbf{x_t} + \mathbf{W_{\text{rec}}} \mathbf{h}_{t-1} + \mathbf{b})
-$$
+$$\mathbf{h_t} = \sigma(\mathbf{W}_{\text{in}} \mathbf{x_t} + \mathbf{W_{\text{rec}}} \mathbf{h}_{t-1} + \mathbf{b})$$
  
 Here, $\sigma(\cdot)$ represents an activation function such as the sigmoid or hyperbolic tangent, $\mathbf{W_{\text{in}}}$ is the input weight matrix, $\mathbf{W}_{\text{rec}}$ is the recurrent weight matrix, and $\mathbf{b}$ is a bias vector.
 
@@ -38,9 +36,8 @@ To address this issue, variations of RNNs have been developed, such as Long Shor
 
 The output of an RNN can be obtained by applying a linear transformation to the hidden state:
 
-\[
-\mathbf{y}_t = \mathbf{W}_{\text{out}} \mathbf{h}_t
-\]
+
+$$\mathbf{y}_t = \mathbf{W}_{\text{out}} \mathbf{h}_t$$
 
 Here, $\mathbf{W}_{\text{out}}$ is the output weight matrix.
 
@@ -56,7 +53,7 @@ Let's consider a time series input sequence of length T, denoted by $\mathbf{x} 
 
 The hidden state $\mathbf{h}_t$ of an LSTM network is computed using the following equations:
 
-\[
+$$
 \begin{align*}
 \mathbf{i}_t &= \sigma(\mathbf{W}_i \mathbf{x}_t + \mathbf{U}_i \mathbf{h}_{t-1} + \mathbf{b}_i) \\
 \mathbf{f}_t &= \sigma(\mathbf{W}_f \mathbf{x}_t + \mathbf{U}_f \mathbf{h}_{t-1} + \mathbf{b}_f) \\
@@ -65,7 +62,7 @@ The hidden state $\mathbf{h}_t$ of an LSTM network is computed using the followi
 \mathbf{c}_t &= \mathbf{f}_t \odot \mathbf{c}_{t-1} + \mathbf{i}_t \odot \mathbf{g}_t \\
 \mathbf{h}_t &= \mathbf{o}_t \odot \tanh(\mathbf{c}_t)
 \end{align*}
-\]
+$$
 
 Here, $\sigma(\cdot)$ is the sigmoid activation function, $\odot$ denotes element-wise multiplication, and $\mathbf{i}_t$, $\mathbf{f}_t$, $\mathbf{o}_t$, and $\mathbf{g}_t$ are called input gate, forget gate, output gate, and candidate cell state vectors, respectively. $\mathbf{W}$ and $\mathbf{U}$ are weight matrices, and $\mathbf{b}$ represents bias vectors.
 
@@ -81,9 +78,8 @@ Let's consider a time series input sequence of length T, denoted by $\mathbf{x} 
 
 The reservoir state $\mathbf{r}_t$ of an ESN is computed using the following equation:
 
-\[
-\mathbf{r}_t = \tanh(\mathbf{W}_{\text{in}} \mathbf{x}_t + \mathbf{W}_{\text{res}} \mathbf{r}_{t-1})
-\]
+
+$$\mathbf{r_t} = \tanh(\mathbf{W}_{\text{in}} \mathbf{x}_t + \mathbf{W}_{\text{res}} \mathbf{r}_{t-1})$$
 
 Here, $\tanh(\cdot)$ represents the hyperbolic tangent activation function, $\mathbf{W}_{\text{in}}$ is the input weight matrix, and $\mathbf{W}_{\text{res}}$ is the reservoir weight matrix.
 
@@ -91,9 +87,8 @@ The reservoir acts as a high-dimensional dynamic memory, capturing and processin
 
 The output of an ESN is obtained by feeding the reservoir state $\mathbf{r}_t$ into a linear readout layer:
 
-\[
-\mathbf{y}_t = \mathbf{W}_{\text{out}} \mathbf{r}_t
-\]
+
+$$\mathbf{y}_t = \mathbf{W}_{\text{out}} \mathbf{r}_t$$
 
 Here, $\mathbf{W}_{\text{out}}$ is the readout weight matrix.
 
@@ -101,38 +96,6 @@ The readout layer learns to map the reservoir state to the desired output by min
 
 ESNs offer several advantages, including their simple training procedure and computational efficiency. The dynamic reservoir provides rich temporal dynamics that enable the network to effectively capture and process complex temporal patterns. ESNs have been successfully applied to various tasks, including time series prediction, speech recognition, and control problems.
 
-
-###
-### Neural Networks
-
-A three-layer feedforward neural network consists of an input layer, a hidden layer, and an output layer. Each layer is composed of multiple neurons, also known as nodes, that receive inputs, perform computations, and generate outputs. The input layer receives the input data, and the output layer generates the final output of the network. The hidden layer(s) perform intermediate computations and extract relevant features from the input data.
-
-Let $x$ be the input data, $y$ be the desired output, $W$ and $b$ be the weights and biases of the neurons, and $\sigma$ be the activation function of the neurons. The computation performed by a three-layer feedforward neural network can be expressed mathematically as follows:
-
-$$h_1 = \sigma(W_1 x + b_1)$$
-
-$$h_2 = \sigma(W_2 h_1 + b_2)$$
-
-$$\hat{y} = \sigma(W_3 h_2 + b_3)$$
-
-where $h_1$ and $h_2$ are the hidden layer outputs, and $\hat{y}$ is the predicted output of the network. $W_1$, $W_2$, and $W_3$ are the weight matrices between the layers, and $b_1$, $b_2$, and $b_3$ are the bias vectors of the neurons. The activation function $\sigma$ is typically a non-linear function that introduces non-linearity into the network and allows it to learn complex relationships between the input and output data. Some common activation functions include the sigmoid function, the ReLU function, and the hyperbolic tangent function.
-
-In practice, the weights and biases of the network are learned through a process called backpropagation, where the network is trained on a set of training data to minimize the difference between the predicted outputs and the desired outputs. This process involves computing the gradient of the loss function with respect to the weights and biases, and updating them using an optimization algorithm such as stochastic gradient descent (SGD).
-
-## Long Short-Term Memory (LSTM) Networks
-
-Long Short-Term Memory (LSTM) networks are a type of recurrent neural network (RNN) that are designed to avoid the long-term dependency problem. This is achieved through their unique cell state structure which allows them to maintain and access information over long sequences, making them particularly effective for tasks involving sequential data such as time series analysis, natural language processing, and more.
-
-The core idea behind LSTMs is the cell state, which runs straight down the entire chain, with only minor linear interactions. It's the LSTM's ability to regulate the cell state's information that makes it so special. At each step in the sequence, there are structures called gates that regulate the information flow into and out of the cell state. These gates are a way to optionally let information through, and they are composed out of a sigmoid neural net layer and a pointwise multiplication operation. The sigmoid layer outputs numbers between zero and one, describing how much of each component should be let through. A value of zero means "let nothing through," while a value of one means "let everything through!" An LSTM has three of these gates: the forget gate, the input gate, and the output gate. These are defined mathematically as follows:
-
-
-$$f_t = \sigma(W_f \cdot [h_{t-1}, x_t] + b_f)$$
-
-$$i_t = \sigma(W_i \cdot [h_{t-1}, x_t] + b_i)$$
-
-$$o_t = \sigma(W_o \cdot [h_{t-1}, x_t] + b_o)$$
-
-where $f_t$, $i_t$, and $o_t$ are the forget, input, and output gates at time $t$, respectively, $\sigma$ is the sigmoid function, $W$ and $b$ are the weight and bias parameters, $h_{t-1}$ is the hidden state from the previous time step, and $x_t$ is the input at the current time step. The forget gate determines how much of the past information (i.e., the cell state) to retain, the input gate decides how much of the current information to store in the cell state, and the output gate determines how much of the information in the cell state to reveal to the next layers in the network.
 
 ## Algorithm Implementation and Development
 

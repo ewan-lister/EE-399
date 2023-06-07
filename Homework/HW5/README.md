@@ -13,18 +13,96 @@ This report presents a comparative study of different neural network architectur
 
 Neural networks provide a greate deal of versatility. Exploiting the weak law of large numbers, as long as there is a large amount of data and enough layers in the network. The network can acheive at least a decent fit. However, systems exist where the output of an input datum is a function of multiple data points, instead of just one. This is where a NN begins to falter. Consider, for instance, well saturated trajectory data of a baseball, where the target we are training for is the next position of the ball after 1 second. If we are only given the ball's position as data and not its velocity, then a neural network would be hard pressed to predict the next position. In fact, a single position measurement of a moving object is a projection of acceleration and velocity (for which time is a basis vector) onto 3 dimensional space. Thus there is no way to capture time based relationships unless multiple positions are considered simultaneously. A neural network trains on data piece by piece. Thus it can't infer that the ball will travel in $\hat{x}$ because the last 3 steps showed a significant change in that direction, atleast if there are multiple trajectories to train on. 
 
-Enter Recurrent Neural Networks. Recurrent Neural Networks (RNNs) are a type of neural network architecture specifically designed to handle sequential data, making them particularly useful for time series analysis. Unlike traditional feed-forward neural networks, RNNs have connections that allow information to flow not only from input to output but also within the network itself, creating a form of memory. This internal memory enables RNNs to capture temporal dependencies and patterns in time series data. RNNs excel at tasks such as predicting future values based on historical data, generating sequences, and modeling dynamic systems. Their ability to retain context over time makes them powerful tools for understanding and forecasting complex time-dependent phenomena.
+What modification do we need to make in order to train time dependent models? We need memory. Recurrent Neural Networks, Long Short-Term Memory, and Echo State Networks each provide some capability for memory of previously trained data using their complex networks. In the following section we will explore their mathematical foundations.
 
-
-
-Neural networks have become one of the most widely used and effective methods in data science for solving various machine learning problems, such as classification, regression, and image recognition. Neural networks are inspired by the functioning of the human brain and consist of multiple layers of interconnected neurons that can learn and extract complex patterns and relationships from data. The popularity of neural networks is due to their ability to automatically learn complex features from raw data, handle large amounts of data, and generalize well to unseen data.
-
-In this report, we compare the performance of a feed-forward neural network with that of other popular machine learning models, such as LSTM, SVM, and decision tree classifiers. LSTM is a type of recurrent neural network that is particularly useful for handling sequential data, such as time series or natural language processing. SVM is a popular method for binary classification that tries to find the optimal decision boundary that maximally separates the two classes. Decision trees are another type of machine learning model that can be used for both classification and regression tasks and are particularly useful for generating interpretable models.
-
-We will begin by covering the theoretical background of NNs, and LSTM, wish a short refresher on SVM and decision tree classifiers. This will follow with an implementation of these models into python, interpreting the results of training the models, followed by a summary and conclusion.
 
 ## Theoretical Background
 
+### Recursive Neural Networks
+
+Recurrent Neural Networks (RNNs) are a class of neural networks designed to process sequential data by maintaining an internal hidden state that captures information from previous time steps. The mathematical theory behind RNNs involves the concept of recurrent connections and the unfolding of the network through time.
+
+Let's consider a time series input sequence of length T, denoted by $\mathbf{x} = (\mathbf{x}_1, \mathbf{x}_2, \ldots, \mathbf{x}_T)$, where $\mathbf{x}_t$ represents the input at time step t. An RNN updates its hidden state $\mathbf{h}_t$ at each time step based on the current input $\mathbf{x}_t$ and the previous hidden state $\mathbf{h}_{t-1}$.
+
+The hidden state $\mathbf{h}_t$ of an RNN is computed using the following equation:
+
+\[
+\mathbf{h}_t = \sigma(\mathbf{W}_{\text{in}} \mathbf{x}_t + \mathbf{W}_{\text{rec}} \mathbf{h}_{t-1} + \mathbf{b})
+\]
+
+Here, $\sigma(\cdot)$ represents an activation function such as the sigmoid or hyperbolic tangent, $\mathbf{W}_{\text{in}}$ is the input weight matrix, $\mathbf{W}_{\text{rec}}$ is the recurrent weight matrix, and $\mathbf{b}$ is a bias vector.
+
+The recurrent connection allows the hidden state to retain information from previous time steps, enabling the RNN to model dependencies and capture temporal patterns in the input sequence. However, a common issue with traditional RNNs is the vanishing or exploding gradients problem, which can hinder their ability to capture long-term dependencies.
+
+To address this issue, variations of RNNs have been developed, such as Long Short-Term Memory (LSTM) and Gated Recurrent Unit (GRU) networks. These architectures incorporate gating mechanisms to selectively update and pass information through time, mitigating the vanishing gradients problem.
+
+The output of an RNN can be obtained by applying a linear transformation to the hidden state:
+
+\[
+\mathbf{y}_t = \mathbf{W}_{\text{out}} \mathbf{h}_t
+\]
+
+Here, $\mathbf{W}_{\text{out}}$ is the output weight matrix.
+
+RNNs can be trained using backpropagation through time (BPTT), which extends the backpropagation algorithm to handle the sequential nature of the network. The objective is typically to minimize a suitable loss function, such as mean squared error or cross-entropy, by adjusting the network's parameters through gradient descent or its variants.
+
+RNNs have shown remarkable success in various applications involving sequential data, including language modeling, machine translation, speech recognition, and sentiment analysis. They excel at modeling dependencies over variable-length sequences, making them powerful tools for tasks that involve sequential information processing.
+
+### LSTM Networks
+
+Long Short-Term Memory (LSTM) networks are a type of recurrent neural network (RNN) that are widely used in deep learning for sequence modeling tasks. The mathematical theory behind LSTM networks involves the concept of memory cells and gates.
+
+Let's consider a time series input sequence of length T, denoted by $\mathbf{x} = (\mathbf{x}_1, \mathbf{x}_2, \ldots, \mathbf{x}_T)$, where $\mathbf{x}_t$ represents the input at time step t. An LSTM network consists of a set of memory cells, each responsible for capturing and propagating information across different time steps. At each time step t, a memory cell is updated based on the current input $\mathbf{x}_t$ and the previous hidden state $\mathbf{h}_{t-1}$.
+
+The hidden state $\mathbf{h}_t$ of an LSTM network is computed using the following equations:
+
+\[
+\begin{align*}
+\mathbf{i}_t &= \sigma(\mathbf{W}_i \mathbf{x}_t + \mathbf{U}_i \mathbf{h}_{t-1} + \mathbf{b}_i) \\
+\mathbf{f}_t &= \sigma(\mathbf{W}_f \mathbf{x}_t + \mathbf{U}_f \mathbf{h}_{t-1} + \mathbf{b}_f) \\
+\mathbf{o}_t &= \sigma(\mathbf{W}_o \mathbf{x}_t + \mathbf{U}_o \mathbf{h}_{t-1} + \mathbf{b}_o) \\
+\mathbf{g}_t &= \tanh(\mathbf{W}_g \mathbf{x}_t + \mathbf{U}_g \mathbf{h}_{t-1} + \mathbf{b}_g) \\
+\mathbf{c}_t &= \mathbf{f}_t \odot \mathbf{c}_{t-1} + \mathbf{i}_t \odot \mathbf{g}_t \\
+\mathbf{h}_t &= \mathbf{o}_t \odot \tanh(\mathbf{c}_t)
+\end{align*}
+\]
+
+Here, $\sigma(\cdot)$ is the sigmoid activation function, $\odot$ denotes element-wise multiplication, and $\mathbf{i}_t$, $\mathbf{f}_t$, $\mathbf{o}_t$, and $\mathbf{g}_t$ are called input gate, forget gate, output gate, and candidate cell state vectors, respectively. $\mathbf{W}$ and $\mathbf{U}$ are weight matrices, and $\mathbf{b}$ represents bias vectors.
+
+The input gate $\mathbf{i}_t$ determines how much of the new input $\mathbf{x}_t$ should be added to the cell state $\mathbf{c}_t$. The forget gate $\mathbf{f}_t$ controls how much of the previous cell state $\mathbf{c}_{t-1}$ should be retained. The output gate $\mathbf{o}_t$ determines how much of the cell state $\mathbf{c}_t$ should be output as the hidden state $\mathbf{h}_t$. The candidate cell state $\mathbf{g}_t$ represents the information that can be potentially stored in the cell state.
+
+In this way, LSTM networks are able to selectively retain or forget information from previous time steps, allowing them to capture long-range dependencies in sequential data. This property makes LSTM networks particularly effective for tasks such as speech recognition, machine translation, and sentiment analysis, where maintaining contextual information over long sequences is crucial.
+
+### Echo State Networks
+
+Echo State Networks (ESNs) are a type of recurrent neural network (RNN) that leverage the concept of reservoir computing. The mathematical theory behind ESNs involves the idea of a dynamic reservoir and a readout layer.
+
+Let's consider a time series input sequence of length T, denoted by $\mathbf{x} = (\mathbf{x}_1, \mathbf{x}_2, \ldots, \mathbf{x}_T)$, where $\mathbf{x}_t$ represents the input at time step t. An ESN consists of a reservoir of recurrently connected neurons that exhibit complex dynamics. The reservoir is updated at each time step based on the current input $\mathbf{x}_t$ and the previous reservoir state $\mathbf{r}_{t-1}$.
+
+The reservoir state $\mathbf{r}_t$ of an ESN is computed using the following equation:
+
+\[
+\mathbf{r}_t = \tanh(\mathbf{W}_{\text{in}} \mathbf{x}_t + \mathbf{W}_{\text{res}} \mathbf{r}_{t-1})
+\]
+
+Here, $\tanh(\cdot)$ represents the hyperbolic tangent activation function, $\mathbf{W}_{\text{in}}$ is the input weight matrix, and $\mathbf{W}_{\text{res}}$ is the reservoir weight matrix.
+
+The reservoir acts as a high-dimensional dynamic memory, capturing and processing temporal information from the input sequence. The reservoir neurons have random or fixed weights, and they are typically sparsely connected to reduce computational complexity. Additionally, the reservoir weights are often set before training and remain fixed throughout the learning process.
+
+The output of an ESN is obtained by feeding the reservoir state $\mathbf{r}_t$ into a linear readout layer:
+
+\[
+\mathbf{y}_t = \mathbf{W}_{\text{out}} \mathbf{r}_t
+\]
+
+Here, $\mathbf{W}_{\text{out}}$ is the readout weight matrix.
+
+The readout layer learns to map the reservoir state to the desired output by minimizing a suitable objective function. This is typically achieved using techniques such as ridge regression or gradient-based optimization methods.
+
+ESNs offer several advantages, including their simple training procedure and computational efficiency. The dynamic reservoir provides rich temporal dynamics that enable the network to effectively capture and process complex temporal patterns. ESNs have been successfully applied to various tasks, including time series prediction, speech recognition, and control problems.
+
+
+###
 ### Neural Networks
 
 A three-layer feedforward neural network consists of an input layer, a hidden layer, and an output layer. Each layer is composed of multiple neurons, also known as nodes, that receive inputs, perform computations, and generate outputs. The input layer receives the input data, and the output layer generates the final output of the network. The hidden layer(s) perform intermediate computations and extract relevant features from the input data.

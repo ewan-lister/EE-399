@@ -1,4 +1,4 @@
-# Homework 4 Report - Comparing Neural Networks with Traditional ML Classifiers
+# Homework 5 Report - Training ML Models on Lorenz System Data
 
 **Author**:
 
@@ -6,9 +6,16 @@ Ewan Lister
 
 **Abstract**:
 
-This report explores the construction of feedforward neural networks, or **FFNNs**, and how they compare to other canonical machine learning techniques. In the first part of the analysis, a three-layer feed-forward neural network is constructed and fitted to a dataset of 31 data points. The network is trained on different samples of the 31 points, and tested on the remainder. The least square errors of the network on the training and test data are computed and compared to the models fit in homework one. In the second part of the analysis, a feed-forward neural network is trained on a PCA compression of the MNIST dataset. The results of the neural network were compared against those of LSTM, SVM, and decision tree classifiers. The report includes code snippets, visualizations, and interpretations of the results.
+This report presents a comparative study of different neural network architectures for forecasting the dynamics of the Lorenz equations. The study focuses on training a neural network to advance the solution from time t to t+∆t for three different values of the control parameter ρ (10, 28, and 40). The trained neural network models are then evaluated for future state prediction at ρ=17 and ρ=35. The comparative analysis includes feed-forward neural networks, LSTM (Long Short-Term Memory) networks, RNN (Recurrent Neural Networks), and Echo State Networks. The report provides an overview of the theoretical background, details of the algorithm implementation and development, computational results, and concludes with a summary and key findings.
+
 
 ## Introduction and Overview
+
+Neural networks provide a greate deal of versatility. Exploiting the weak law of large numbers, as long as there is a large amount of data and enough layers in the network. The network can acheive at least a decent fit. However, systems exist where the output of an input datum is a function of multiple data points, instead of just one. This is where a NN begins to falter. Consider, for instance, well saturated trajectory data of a baseball, where the target we are training for is the next position of the ball after 1 second. If we are only given the ball's position as data and not its velocity, then a neural network would be hard pressed to predict the next position. In fact, a single position measurement of a moving object is a projection of acceleration and velocity (for which time is a basis vector) onto 3 dimensional space. Thus there is no way to capture time based relationships unless multiple positions are considered simultaneously. A neural network trains on data piece by piece. Thus it can't infer that the ball will travel in $\hat{x}$ because the last 3 steps showed a significant change in that direction, atleast if there are multiple trajectories to train on. 
+
+Enter Recurrent Neural Networks. Recurrent Neural Networks (RNNs) are a type of neural network architecture specifically designed to handle sequential data, making them particularly useful for time series analysis. Unlike traditional feed-forward neural networks, RNNs have connections that allow information to flow not only from input to output but also within the network itself, creating a form of memory. This internal memory enables RNNs to capture temporal dependencies and patterns in time series data. RNNs excel at tasks such as predicting future values based on historical data, generating sequences, and modeling dynamic systems. Their ability to retain context over time makes them powerful tools for understanding and forecasting complex time-dependent phenomena.
+
+
 
 Neural networks have become one of the most widely used and effective methods in data science for solving various machine learning problems, such as classification, regression, and image recognition. Neural networks are inspired by the functioning of the human brain and consist of multiple layers of interconnected neurons that can learn and extract complex patterns and relationships from data. The popularity of neural networks is due to their ability to automatically learn complex features from raw data, handle large amounts of data, and generalize well to unseen data.
 

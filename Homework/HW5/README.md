@@ -22,15 +22,15 @@ What modification do we need to make in order to train time dependent models? We
 
 Recurrent Neural Networks (RNNs) are a class of neural networks designed to process sequential data by maintaining an internal hidden state that captures information from previous time steps. The mathematical theory behind RNNs involves the concept of recurrent connections and the unfolding of the network through time.
 
-Let's consider a time series input sequence of length T, denoted by $\mathbf{x} = (\mathbf{x}_1, \mathbf{x}_2, \ldots, \mathbf{x}_T)$, where $\mathbf{x}_t$ represents the input at time step t. An RNN updates its hidden state $\mathbf{h}_t$ at each time step based on the current input $\mathbf{x}_t$ and the previous hidden state $\mathbf{h}_{t-1}$.
+Let's consider a time series input sequence of length T, denoted by $\mathbf{x} = (\mathbf{x}_1, \mathbf{x}_2, \ldots, \mathbf{x}_T)$, where $\mathbf{x}_t$ represents the input at time step t. An RNN updates its hidden state $\mathbf{h}_t$ at each time step based on the current input $\mathbf{x_t}$ and the previous hidden state $\mathbf{h}_{t-1}$.
 
 The hidden state $\mathbf{h}_t$ of an RNN is computed using the following equation:
 
-\[
-\mathbf{h}_t = \sigma(\mathbf{W}_{\text{in}} \mathbf{x}_t + \mathbf{W}_{\text{rec}} \mathbf{h}_{t-1} + \mathbf{b})
-\]
-
-Here, $\sigma(\cdot)$ represents an activation function such as the sigmoid or hyperbolic tangent, $\mathbf{W}_{\text{in}}$ is the input weight matrix, $\mathbf{W}_{\text{rec}}$ is the recurrent weight matrix, and $\mathbf{b}$ is a bias vector.
+$$
+\mathbf{h_t} = \sigma(\mathbf{W}_{\text{in}} \mathbf{x_t} + \mathbf{W_{\text{rec}}} \mathbf{h}_{t-1} + \mathbf{b})
+$$
+ 
+Here, $\sigma(\cdot)$ represents an activation function such as the sigmoid or hyperbolic tangent, $\mathbf{W_{\text{in}}}$ is the input weight matrix, $\mathbf{W}_{\text{rec}}$ is the recurrent weight matrix, and $\mathbf{b}$ is a bias vector.
 
 The recurrent connection allows the hidden state to retain information from previous time steps, enabling the RNN to model dependencies and capture temporal patterns in the input sequence. However, a common issue with traditional RNNs is the vanishing or exploding gradients problem, which can hinder their ability to capture long-term dependencies.
 

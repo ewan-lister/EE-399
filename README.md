@@ -1,5 +1,5 @@
 # EE-399
-Code and assignments completed for EE 399, a machine learning course
+Code and assignments completed for EE 399, a machine learning course. As the homeworks progress I complete projects in Principal Component Analysis, Support Vector Machines, Recurrent Neural Networks, and Echo State Networks.
 
 ## HW Reports
 

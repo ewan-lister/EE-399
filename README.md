@@ -1,5 +1,9 @@
 # EE-399 Machine Learning for Science and Engineering
+
+This Repository showcases that I have learned in Machine Learning, and have continued to apply in my studies and work.
+
 Code and assignments completed for EE 399, a machine learning course. As the homeworks progress I complete projects in Principal Component Analysis, Support Vector Machines, Recurrent Neural Networks, and Echo State Networks.
+
 
 ## HW Reports
 
